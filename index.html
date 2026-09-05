@@ -922,14 +922,16 @@
           <div class="field" style="margin-bottom:12px;">
             <label>¿Qué ingrediente te falta?</label>
             <select id="sustituto-sel" onchange="mostrarSustituto()">
-              <option value="buttermilk">1 taza de Buttermilk / Suero de leche</option>
-              <option value="polvos">1 cucharadita de Polvos de hornear</option>
-              <option value="azucarflor">1 taza de Azúcar flor / glass</option>
-              <option value="harinaleudante">1 taza de Harina con polvos (leudante)</option>
-              <option value="huevo">1 Huevo (para humedad y estructura)</option>
-              <option value="chocolate">30 g de Chocolate cobertura amargo</option>
-              <option value="miel">1 taza de Miel o Melaza</option>
-              <option value="crema">1 taza de Crema ácida / Sour cream</option>
+              <option value="buttermilk">🥛 1 taza de Leche cortada / Buttermilk (Suero de leche)</option>
+              <option value="polvos">✨ 1 cucharadita de Polvos de hornear</option>
+              <option value="azucarflor">🍬 1 taza de Azúcar flor (impalpable / glass)</option>
+              <option value="harinaleudante">🌾 1 taza de Harina con polvos de hornear (leudante)</option>
+              <option value="huevo">🥚 1 Huevo (para humedad y estructura)</option>
+              <option value="chocolate">🍫 30 g de Chocolate cobertura amargo</option>
+              <option value="miel">🍯 1 taza de Miel de abejas / Miel de palma</option>
+              <option value="crema">🥣 1 taza de Crema ácida / Crema agria (Sour cream)</option>
+              <option value="manjar">🍮 1 taza de Manjar / Dulce de leche fluido</option>
+              <option value="vanilla">🌿 1 cucharadita de Esencia de vainilla</option>
             </select>
           </div>
 
@@ -2470,14 +2472,16 @@ function calcularHuevos(){
 }
 
 const recetasSustitutos = {
-  'buttermilk': '🥛 <b>1 taza de Buttermilk:</b> Mezcla <b>240 ml de leche</b> con <b>1 cucharada (15 ml) de jugo de limón o vinagre blanco</b>. Deja reposar a temperatura ambiente 10 a 15 minutos hasta que se corte ligeramente.',
-  'polvos': '✨ <b>1 cdta de Polvos de hornear:</b> Mezcla <b>1/4 cdta de bicarbonato de sodio</b> + <b>1/2 cdta de cremor tártaro</b> (o añade unas gotas de limón a los líquidos de la receta).',
-  'azucarflor': '🍬 <b>1 taza de Azúcar flor / glass:</b> Coloca en la licuadora o procesadora <b>1 taza (200g) de azúcar granulada</b> + <b>1 cdta (5g) de maicena</b>. Licúa a máxima potencia por 1 minuto hasta pulverizar fino.',
-  'harinaleudante': '🌾 <b>1 taza de Harina con polvos (leudante):</b> Usa <b>1 taza (125g) de harina sin polvos</b> + <b>1.5 cucharadita (7g) de polvos de hornear</b> + <b>1/4 cdta de sal fina</b>. Cierne 2 veces.',
-  'huevo': '🥚 <b>1 Huevo (para humedad y textura):</b> Elige una opción:<br>• <b>1/2 plátano maduro machacado</b> (para queques húmedos).<br>• <b>60g de puré de manzana</b> sin azúcar.<br>• <b>1 cda de chía o linaza molida</b> + 3 cdas de agua tibia (reposar 10 min).<br>• <b>60g de yogur natural</b>.',
-  'chocolate': '🍫 <b>30g de Chocolate cobertura amargo:</b> Mezcla <b>3 cucharadas (18g) de cacao en polvo amargo</b> + <b>1 cucharada (14g) de mantequilla derretida o aceite</b>.',
-  'miel': '🍯 <b>1 taza de Miel o Melaza:</b> Sustituye por <b>1 taza de azúcar</b> + <b>60 ml (1/4 taza) de agua o leche</b> (reduciendo ligeramente el líquido total de la receta).',
-  'crema': '🥣 <b>1 taza de Crema ácida (Sour cream):</b> Mezcla <b>240 ml de yogur natural / griego</b> con <b>1 cucharada de jugo de limón</b>.'
+  'buttermilk': '🥛 <b>1 taza de Leche cortada / Buttermilk:</b> Mezcla <b>240 ml (1 taza) de leche entera o semidescremada</b> con <b>1 cucharada (15 ml) de jugo de limón o vinagre blanco</b>. Deja reposar a temperatura ambiente 10 a 15 minutos sin revolver hasta que se corte ligeramente.',
+  'polvos': '✨ <b>1 cdta de Polvos de hornear:</b> Mezcla <b>1/4 cdta de bicarbonato de sodio</b> + <b>1/2 cdta de cremor tártaro</b> (o añade unas gotas de limón a los líquidos de la mezcla).',
+  'azucarflor': '🍬 <b>1 taza de Azúcar flor (impalpable / glass):</b> Coloca en la licuadora o procesadora <b>1 taza (200 g) de azúcar granulada</b> + <b>1 cdta (5 g) de maicena</b>. Licúa a máxima potencia por 1 minuto hasta pulverizar fino.',
+  'harinaleudante': '🌾 <b>1 taza de Harina con polvos de hornear (leudante):</b> Usa <b>1 taza (125 g) de harina sin polvos</b> + <b>1.5 cucharaditas (7 g) de polvos de hornear</b> + <b>1 pizca de sal fina</b>. Cierne 2 veces.',
+  'huevo': '🥚 <b>1 Huevo (para humedad y estructura):</b> Elige una opción:<br>• <b>1/2 plátano maduro bien molido</b> (para queques y muffins).<br>• <b>60 g (1/4 taza) de puré de manzana</b> sin azúcar.<br>• <b>1 cda de chía o linaza molida</b> + 3 cdas de agua tibia (reposar 10 min).<br>• <b>60 g de yogur natural entero</b>.<br>• <b>1/4 taza de mayonesa</b> (para bizcochos húmedos de chocolate).',
+  'chocolate': '🍫 <b>30 g de Chocolate cobertura amargo:</b> Mezcla <b>3 cucharadas (18 g) de cacao amargo en polvo</b> + <b>1 cucharada (14 g) de mantequilla derretida, margarina o aceite</b>.',
+  'miel': '🍯 <b>1 taza de Miel de abejas o Miel de palma:</b> Sustituye por <b>1 taza de azúcar granulada o rubia</b> + <b>60 ml (1/4 taza) de agua o leche</b> (reduciendo esa misma cantidad del líquido total de la receta).',
+  'crema': '🥣 <b>1 taza de Crema ácida (Sour cream / Crema agria):</b> Mezcla <b>240 ml (1 taza) de crema de leche o yogur natural/griego</b> con <b>1 cucharada de jugo de limón o vinagre blanco</b>.',
+  'manjar': '🍮 <b>1 taza de Manjar / Dulce de leche fluido:</b> Calienta <b>1 taza de manjar tradicional</b> con <b>2 a 3 cucharadas de crema de leche o leche tibia</b> revolviendo a fuego bajo hasta aflojar.',
+  'vanilla': '🌿 <b>1 cdta de Esencia de vainilla:</b> Sustituye por <b>1/2 cdta de ralladura de cáscara de naranja o limón</b> o <b>1/4 cdta de canela en polvo</b> o <b>1 cdta de licor (pisco, ron, amaretto)</b>.'
 };
 
 function mostrarSustituto(){
