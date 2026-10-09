@@ -1,1 +1,9 @@
 .vercel
+client_secret_*.json
+GOOGLE.txt
+*.env
+.env*
+node_modules
+dist
+
+

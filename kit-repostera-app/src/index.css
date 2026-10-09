@@ -1,0 +1,61 @@
+@import "tailwindcss";
+@import "./assets/fonts/local-fonts.css";
+
+:root {
+  /* Superficies y texto */
+  --fondo: #F7F3ED;
+  --superficie: #FFFDFA;
+  --superficie-2: #FCFAF7;
+  --linea: #E7DDD2;
+  --linea-suave: #EFE7DE;
+  --tinta: #2E2621;
+  --tinta-media: #5C4E45;
+  --tinta-suave: #6E6058;
+  --tinta-tenue: #8A7A6E;
+
+  /* Marca */
+  --vino: #8E3A58;
+  --vino-oscuro: #6F2B43;
+  --vino-suave: #F6E9EE;
+  --vino-borde: #E0C8D1;
+  --rosa-aviso: #FBF1F4;
+  --rosa-aviso-borde: #EAD7DC;
+  --oro: #7C6124;
+  --oro-fondo: #F8F0DF;
+  --verde: #4C5A48;
+  --verde-fondo: #E9EFE7;
+  --usuaria: #6F5A7E;
+
+  /* Colores de gráfico */
+  --grafico-1: #8E3A58;
+  --grafico-2: #B2743C;
+  --grafico-pista: #EFE7DC;
+
+  /* Tipografía */
+  --font-titulo: 'Playfair Display', Georgia, serif;
+  --font-cuerpo: 'DM Sans', system-ui, -apple-system, sans-serif;
+
+  /* Sombras */
+  --sombra-panel: 0 18px 45px rgba(66, 42, 28, 0.08);
+  --sombra-indicador: 0 8px 28px rgba(66, 42, 28, 0.035);
+  --sombra-tarjeta-mobile: 0 6px 18px rgba(66, 42, 28, 0.04);
+  --sombra-boton: 0 9px 18px rgba(142, 58, 88, 0.20);
+  --sombra-menu-activo: 0 8px 18px rgba(142, 58, 88, 0.20);
+}
+
+@layer base {
+  body {
+    background-color: var(--fondo);
+    color: var(--tinta);
+    font-family: var(--font-cuerpo);
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+.num {
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+.font-serif-title {
+  font-family: var(--font-titulo);
+}

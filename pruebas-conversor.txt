@@ -1,0 +1,41 @@
+CASOS DE PRUEBA DE CONVERSIÓN - KIT DE LA REPOSTERA
+===================================================
+Fecha de captura: 2026-10-01
+Valores capturados directamente de la interfaz de la aplicación (con formato y redondeo real en pantalla).
+
+CASO 1: Tazas & Cucharas (Taza)
+------------------------------
+- Ingrediente seleccionado: Harina de trigo
+- Cantidad: 1 taza
+- Texto resultante en pantalla: "125 g" (Volumen equivalente: "240 ml")
+
+CASO 2: Tazas & Cucharas (Taza)
+------------------------------
+- Ingrediente seleccionado: Mantequilla
+- Cantidad: 1 taza
+- Texto resultante en pantalla: "225 g" (Volumen equivalente: "240 ml")
+
+CASO 3: Tazas & Cucharas (Cucharada)
+------------------------------------
+- Tipo de medida: Cucharada sopera (tbsp)
+- Ingrediente seleccionado: Azúcar
+- Cantidad: 1 tbsp
+- Texto resultante en pantalla: "10 g"
+
+CASO 4: Peso & Volumen
+----------------------
+- Valor original: 1
+- Unidad origen: Kilos (kg)
+- Unidad destino: Gramos (g)
+- Texto resultante en pantalla: "1 Kilos (kg) = 1.000 Gramos (g)"
+
+CASO 5: Ajustador de Moldes
+---------------------------
+- Molde origen: Redondo (Diámetro 20 cm / 8 in)
+- Molde nuevo: Redondo (Diámetro 26 cm / 10 in)
+- Factor resultante en pantalla: "1,69x"
+
+CASO 6: Sustitutos Express
+--------------------------
+- Sustituto seleccionado: Leche cortada / Buttermilk
+- Texto resultante en pantalla: "🥛 1 taza de Leche cortada / Buttermilk: Mezcla 240 ml (1 taza) de leche entera o semidescremada con 1 cucharada (15 ml) de jugo de limón o vinagre blanco. Deja reposar a temperatura ambiente 10 a 15 minutos sin revolver hasta que se corte ligeramente."
