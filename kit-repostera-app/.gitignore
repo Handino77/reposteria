@@ -23,6 +23,8 @@ dist-ssr
 *.sln
 *.sw?
 
-# Local test scripts
+# Local test scripts & Vercel cache
 scripts/
+.vercel/
+
 
