@@ -79,7 +79,7 @@ export default function Pedidos({ user, isPro = false, onIrALogin, onIrASuscripc
   }
 
   const fetchDatos = async () => {
-    if (!user) {
+    if (!user || !isPro) {
       setPedidosList([])
       setRecetasGuardadas([])
       setDespensaItems([])
@@ -449,13 +449,7 @@ export default function Pedidos({ user, isPro = false, onIrALogin, onIrASuscripc
           <span>Dom</span>
         </div>
 
-        {loading ? (
-          <div className="p-12 text-center text-xs text-[var(--tinta-suave)] flex flex-col items-center gap-2">
-            <Loader2 className="w-6 h-6 animate-spin text-[var(--vino)]" />
-            <span>Cargando tu calendario...</span>
-          </div>
-        ) : (
-          <div className="grid grid-cols-7 divide-x divide-y divide-[var(--linea-suave)]">
+        <div className="grid grid-cols-7 divide-x divide-y divide-[var(--linea-suave)]">
             {diasMatriz.map((fechaObj, idx) => {
               if (!fechaObj) {
                 return <div key={`empty-${idx}`} className="bg-[var(--superficie-2)]/40 min-h-[90px] md:min-h-[120px]" />
@@ -515,7 +509,6 @@ export default function Pedidos({ user, isPro = false, onIrALogin, onIrASuscripc
               )
             })}
           </div>
-        )}
       </Panel>
 
       {/* Tip de Eli */}
