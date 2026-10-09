@@ -10,15 +10,21 @@ import {
   Crown,
   LogOut,
   HelpCircle,
-  Sparkles,
+  LogIn,
   ChevronRight
 } from 'lucide-react'
 
-export function Layout({ activeTab, setActiveTab, user, onSignOut, children }) {
+export function Layout({
+  activeTab,
+  setActiveTab,
+  user,
+  isPro = false,
+  onSignOut,
+  children
+}) {
   const activeNavRef = useRef(null)
   const navContainerRef = useRef(null)
 
-  // Scroll automático en mobile para mantener la opción activa a la vista
   useEffect(() => {
     if (activeNavRef.current) {
       activeNavRef.current.scrollIntoView({
@@ -35,7 +41,7 @@ export function Layout({ activeTab, setActiveTab, user, onSignOut, children }) {
     { id: 'costos', label: 'Precio justo', icon: Calculator },
     { id: 'escalador', label: 'Ajusta tu receta', icon: Scale },
     { id: 'conversor', label: 'Conversor', icon: RefreshCw },
-    { id: 'pedidos', label: 'Mis pedidos', icon: CalendarIcon }
+    { id: 'pedidos', label: 'Mis pedidos', icon: CalendarIcon, proBadge: !isPro }
   ]
 
   const userInitial = user?.email ? user.email.charAt(0).toUpperCase() : 'J'
@@ -88,6 +94,11 @@ export function Layout({ activeTab, setActiveTab, user, onSignOut, children }) {
                 >
                   <Icon className="w-[18px] h-[18px] stroke-[1.8] shrink-0" />
                   <span className="truncate">{item.label}</span>
+                  {item.proBadge && (
+                    <span className="ml-auto text-[9.5px] font-extrabold uppercase bg-[var(--oro-fondo)] text-[var(--oro)] px-1.5 py-0.5 rounded-full tracking-wider">
+                      PRO
+                    </span>
+                  )}
                 </button>
               )
             })}
@@ -105,7 +116,9 @@ export function Layout({ activeTab, setActiveTab, user, onSignOut, children }) {
               }`}
             >
               <Crown className="w-4 h-4 stroke-[1.8] shrink-0" />
-              <span className="truncate">Mi suscripción</span>
+              <span className="truncate">
+                {isPro ? 'Suscripción PRO 👑' : 'Planes & PRO 👑'}
+              </span>
               <ChevronRight className="w-3.5 h-3.5 ml-auto opacity-70" />
             </button>
 
@@ -151,31 +164,36 @@ export function Layout({ activeTab, setActiveTab, user, onSignOut, children }) {
 
         {/* Área de Contenido Principal */}
         <main className="p-8 px-10 min-w-0 flex flex-col gap-6">
-          {/* Header Superior Derecha (Usuario + Logout) */}
+          {/* Header Superior Derecha (Usuario + Login/Logout) */}
           <div className="flex justify-end items-center gap-3">
-            <button
-              type="button"
-              aria-label="Ayuda"
-              className="w-9 h-9 border border-[var(--linea)] bg-[var(--superficie)] rounded-[12px] flex items-center justify-center text-[var(--tinta-media)] hover:bg-[var(--superficie-2)] cursor-pointer"
-            >
-              <HelpCircle className="w-4 h-4 stroke-[1.8]" />
-            </button>
+            {user ? (
+              <>
+                <div className="flex items-center gap-2 border border-[var(--linea)] bg-[var(--superficie)] p-1 pr-3 rounded-full text-xs font-semibold text-[var(--tinta)]">
+                  <span className="w-7 h-7 rounded-full bg-[var(--usuaria)] text-white flex items-center justify-center font-serif-title text-xs">
+                    {userInitial}
+                  </span>
+                  <span className="max-w-[120px] truncate">{userName}</span>
+                </div>
 
-            <div className="flex items-center gap-2 border border-[var(--linea)] bg-[var(--superficie)] p-1 pr-3 rounded-full text-xs font-semibold text-[var(--tinta)]">
-              <span className="w-7 h-7 rounded-full bg-[var(--usuaria)] text-white flex items-center justify-center font-serif-title text-xs">
-                {userInitial}
-              </span>
-              <span className="max-w-[120px] truncate">{userName}</span>
-            </div>
-
-            {onSignOut && (
+                {onSignOut && (
+                  <button
+                    type="button"
+                    onClick={onSignOut}
+                    title="Cerrar sesión"
+                    className="w-9 h-9 border border-[var(--linea)] bg-[var(--superficie)] rounded-[12px] flex items-center justify-center text-[var(--tinta-suave)] hover:text-red-600 hover:bg-red-50 cursor-pointer"
+                  >
+                    <LogOut className="w-4 h-4 stroke-[1.8]" />
+                  </button>
+                )}
+              </>
+            ) : (
               <button
                 type="button"
-                onClick={onSignOut}
-                title="Cerrar sesión"
-                className="w-9 h-9 border border-[var(--linea)] bg-[var(--superficie)] rounded-[12px] flex items-center justify-center text-[var(--tinta-suave)] hover:text-red-600 hover:bg-red-50 cursor-pointer"
+                onClick={() => setActiveTab('login')}
+                className="flex items-center gap-2 bg-[var(--vino)] text-white text-xs font-semibold px-4 py-2 rounded-full hover:brightness-110 shadow-xs cursor-pointer transition-all"
               >
-                <LogOut className="w-4 h-4 stroke-[1.8]" />
+                <LogIn className="w-3.5 h-3.5 stroke-[2]" />
+                <span>Iniciar Sesión / Registrarse</span>
               </button>
             )}
           </div>
@@ -228,17 +246,31 @@ export function Layout({ activeTab, setActiveTab, user, onSignOut, children }) {
                 <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
               </svg>
             </a>
-            <div className="w-8 h-8 rounded-full bg-[var(--usuaria)] text-white flex items-center justify-center font-serif-title text-xs font-semibold ml-1">
-              {userInitial}
-            </div>
-            {onSignOut && (
+
+            {user ? (
+              <>
+                <div className="w-8 h-8 rounded-full bg-[var(--usuaria)] text-white flex items-center justify-center font-serif-title text-xs font-semibold ml-1">
+                  {userInitial}
+                </div>
+                {onSignOut && (
+                  <button
+                    type="button"
+                    onClick={onSignOut}
+                    aria-label="Cerrar sesión"
+                    className="p-1.5 text-[var(--tinta-suave)] hover:text-red-600"
+                  >
+                    <LogOut className="w-4 h-4 stroke-[1.8]" />
+                  </button>
+                )}
+              </>
+            ) : (
               <button
                 type="button"
-                onClick={onSignOut}
-                aria-label="Cerrar sesión"
-                className="p-1.5 text-[var(--tinta-suave)] hover:text-red-600"
+                onClick={() => setActiveTab('login')}
+                className="flex items-center gap-1 bg-[var(--vino)] text-white text-[11px] font-semibold px-3 py-1.5 rounded-full hover:brightness-110 shadow-xs cursor-pointer ml-1"
               >
-                <LogOut className="w-4 h-4 stroke-[1.8]" />
+                <LogIn className="w-3 h-3" />
+                <span>Ingresar</span>
               </button>
             )}
           </div>
@@ -246,7 +278,6 @@ export function Layout({ activeTab, setActiveTab, user, onSignOut, children }) {
 
         {/* Carril de Navegación Deslizable Horizontal */}
         <div className="sticky top-[57px] z-20 bg-[var(--superficie)] border-b border-[var(--linea)] relative">
-          {/* Pista visual: degradado difuminado a la derecha que indica scroll disponible */}
           <div
             className="pointer-events-none absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-[var(--superficie)] to-transparent z-10"
             aria-hidden="true"

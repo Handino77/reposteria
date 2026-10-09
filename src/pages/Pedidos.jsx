@@ -21,15 +21,22 @@ import {
   ChefHat,
   Loader2,
   DollarSign,
-  ShoppingBag
+  ShoppingBag,
+  Crown,
+  Sparkles
 } from 'lucide-react'
+import { ModalUpsell } from '../components/ModalUpsell'
 
-export default function Pedidos({ user }) {
+export default function Pedidos({ user, isPro = false, onIrALogin, onIrASuscripcion }) {
   const [pedidosList, setPedidosList] = useState([])
   const [recetasGuardadas, setRecetasGuardadas] = useState([])
   const [despensaItems, setDespensaItems] = useState([])
   const [loading, setLoading] = useState(true)
   const [showComprasModal, setShowComprasModal] = useState(false)
+
+  // Estado Modal Upsell
+  const [showUpsell, setShowUpsell] = useState(false)
+  const [upsellModo, setUpsellModo] = useState('pedidos_pro')
 
   // Mes en vista (Date object)
   const [calActual, setCalActual] = useState(new Date())
@@ -57,11 +64,29 @@ export default function Pedidos({ user }) {
     setTimeout(() => setToastMsg(''), 3000)
   }
 
-  useEffect(() => {
-    fetchDatos()
-  }, [user])
+  const handleRequirePro = (action) => {
+    if (!user) {
+      setUpsellModo('login')
+      setShowUpsell(true)
+      return
+    }
+    if (!isPro) {
+      setUpsellModo('pedidos_pro')
+      setShowUpsell(true)
+      return
+    }
+    action()
+  }
 
   const fetchDatos = async () => {
+    if (!user) {
+      setPedidosList([])
+      setRecetasGuardadas([])
+      setDespensaItems([])
+      setLoading(false)
+      return
+    }
+
     try {
       setLoading(true)
       // 1. Cargar pedidos con sus pedido_items
@@ -356,13 +381,28 @@ export default function Pedidos({ user }) {
         ))}
       </datalist>
 
+      {/* Banner de aviso PRO si es usuario gratis */}
+      {!isPro && (
+        <div className="bg-[var(--oro-fondo)] border border-[var(--oro-borde)] p-3.5 rounded-[16px] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-[var(--oro)]">
+          <div className="flex items-center gap-2.5">
+            <Crown className="w-5 h-5 shrink-0 text-[var(--oro)]" />
+            <span>
+              <b>Función Exclusiva Plan PRO:</b> El calendario de encargos y las listas de compras automáticas para WhatsApp requieren la suscripción PRO ($3.000 CLP/mes).
+            </span>
+          </div>
+          <Boton variante="oro" size="sm" onClick={() => handleRequirePro(() => {})}>
+            Obtener Plan PRO 👑
+          </Boton>
+        </div>
+      )}
+
       {/* Encabezado */}
       <EncabezadoPagina
         antetitulo="Hecho con cariño por Eli 💖"
         titulo="Mis pedidos"
         introduccion="Agenda tus encargos en el calendario y genera automáticamente tu lista de compras semanal."
         acciones={
-          <Boton variante="principal" onClick={() => setShowComprasModal(true)}>
+          <Boton variante="principal" onClick={() => handleRequirePro(() => setShowComprasModal(true))}>
             <ShoppingBag className="w-4 h-4 stroke-[2]" />
             <span>Generar Lista de Compras</span>
           </Boton>
@@ -388,7 +428,7 @@ export default function Pedidos({ user }) {
             <Boton variante="secundario" size="sm" onClick={() => setCalActual(new Date())}>
               Hoy
             </Boton>
-            <Boton variante="secundario" size="sm" onClick={() => setShowComprasModal(true)}>
+            <Boton variante="secundario" size="sm" onClick={() => handleRequirePro(() => setShowComprasModal(true))}>
               <ShoppingBag className="w-3.5 h-3.5" />
               <span>Lista de Compras</span>
             </Boton>
@@ -428,7 +468,7 @@ export default function Pedidos({ user }) {
               return (
                 <div
                   key={fechaStr}
-                  onClick={() => setModalFecha(fechaStr)}
+                  onClick={() => handleRequirePro(() => setModalFecha(fechaStr))}
                   className={`min-h-[90px] md:min-h-[120px] p-2 flex flex-col justify-between transition-colors cursor-pointer hover:bg-[var(--superficie-2)] ${
                     esHoy ? 'bg-[var(--vino-suave)]/30' : 'bg-[var(--superficie)]'
                   }`}
@@ -724,6 +764,15 @@ export default function Pedidos({ user }) {
         pedidosList={pedidosList}
         recetasGuardadas={recetasGuardadas}
         despensaItems={despensaItems}
+      />
+
+      {/* Modal Upsell / Promoción PRO */}
+      <ModalUpsell
+        isOpen={showUpsell}
+        onClose={() => setShowUpsell(false)}
+        modo={upsellModo}
+        onIrALogin={onIrALogin}
+        onIrASuscripcion={onIrASuscripcion}
       />
     </div>
   )

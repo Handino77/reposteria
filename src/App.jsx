@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import { supabase } from './lib/supabaseClient'
-import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 import { Loader2 } from 'lucide-react'
 
@@ -28,12 +27,14 @@ export default function App() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#FFFBF5] flex flex-col items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-[#C2185B]" />
-        <p className="mt-2 text-sm font-medium text-[#6B5647]">Cargando Kit de la Repostera...</p>
+      <div className="min-h-screen bg-[var(--fondo)] flex flex-col items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-[var(--vino)]" />
+        <p className="mt-2 text-sm font-medium text-[var(--tinta-suave)]">
+          Cargando Kit de la Repostera...
+        </p>
       </div>
     )
   }
 
-  return session ? <Dashboard user={session.user} /> : <Login />
+  return <Dashboard user={session?.user || null} />
 }

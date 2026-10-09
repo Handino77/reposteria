@@ -7,13 +7,18 @@ import { Campo, Input, Select } from '../components/ui/Campo'
 import { Boton } from '../components/ui/Boton'
 import { Pastilla } from '../components/ui/Pastilla'
 import { BookOpen, Plus, Trash2, Edit2, Calculator, Search, Loader2, Sparkles, CheckCircle2 } from 'lucide-react'
+import { ModalUpsell } from '../components/ModalUpsell'
 
-export default function Recetas({ user, onCostearReceta }) {
+export default function Recetas({ user, isPro = false, onCostearReceta, onIrALogin, onIrASuscripcion }) {
   const [recetas, setRecetas] = useState([])
   const [despensaItems, setDespensaItems] = useState([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+
+  // Estado Modal Upsell
+  const [showUpsell, setShowUpsell] = useState(false)
+  const [upsellModo, setUpsellModo] = useState('login')
 
   // Campos de formulario
   const [editId, setEditId] = useState(null)
@@ -40,6 +45,13 @@ export default function Recetas({ user, onCostearReceta }) {
   }
 
   const fetchRecetasYDespensa = async () => {
+    if (!user) {
+      setRecetas([])
+      setDespensaItems([])
+      setLoading(false)
+      return
+    }
+
     try {
       setLoading(true)
       // Cargar recetas con sus líneas de receta_ingredientes
@@ -185,6 +197,20 @@ export default function Recetas({ user, onCostearReceta }) {
     e.preventDefault()
     if (!nombre.trim() || !rinde || parseFloat(rinde) <= 0 || ingredientesLinea.length === 0) {
       showToast('Indica nombre, rendimiento y al menos un ingrediente')
+      return
+    }
+
+    // 1. Si no hay usuario logueado -> Pedir Login/Registro
+    if (!user) {
+      setUpsellModo('login')
+      setShowUpsell(true)
+      return
+    }
+
+    // 2. Si es usuario Gratis y va a crear una receta nueva -> Verificar límite de 3
+    if (!isPro && !editId && recetas.length >= 3) {
+      setUpsellModo('limit_recetas')
+      setShowUpsell(true)
       return
     }
 
@@ -596,6 +622,15 @@ export default function Recetas({ user, onCostearReceta }) {
           </div>
         </form>
       </Panel>
+
+      {/* Modal Upsell / Promoción PRO */}
+      <ModalUpsell
+        isOpen={showUpsell}
+        onClose={() => setShowUpsell(false)}
+        modo={upsellModo}
+        onIrALogin={onIrALogin}
+        onIrASuscripcion={onIrASuscripcion}
+      />
     </div>
   )
 }

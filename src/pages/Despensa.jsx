@@ -9,12 +9,17 @@ import { Boton } from '../components/ui/Boton'
 import { Pastilla } from '../components/ui/Pastilla'
 import { TipDeEli } from '../components/ui/TipDeEli'
 import { Plus, Search, Edit2, Trash2, Loader2, Check } from 'lucide-react'
+import { ModalUpsell } from '../components/ModalUpsell'
 
-export default function Despensa({ user }) {
+export default function Despensa({ user, isPro = false, onIrALogin, onIrASuscripcion }) {
   const [ingredientes, setIngredientes] = useState([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+
+  // Estado Modal Upsell
+  const [showUpsell, setShowUpsell] = useState(false)
+  const [upsellModo, setUpsellModo] = useState('login')
 
   // Campos del formulario
   const [editId, setEditId] = useState(null)
@@ -34,6 +39,12 @@ export default function Despensa({ user }) {
   }
 
   const fetchDespensa = async () => {
+    if (!user) {
+      setIngredientes([])
+      setLoading(false)
+      return
+    }
+
     try {
       setLoading(true)
       const { data, error } = await supabase
@@ -55,6 +66,20 @@ export default function Despensa({ user }) {
     e.preventDefault()
     if (!nombre.trim() || !cantidad || isNaN(parseFloat(precio))) {
       showToast('Por favor completa todos los campos correctamente')
+      return
+    }
+
+    // 1. Si no hay usuario logueado -> Pedir Login/Registro
+    if (!user) {
+      setUpsellModo('login')
+      setShowUpsell(true)
+      return
+    }
+
+    // 2. Si es usuario Gratis y va a crear un ingrediente nuevo -> Verificar límite de 5
+    if (!isPro && !editId && ingredientes.length >= 5) {
+      setUpsellModo('limit_despensa')
+      setShowUpsell(true)
       return
     }
 
@@ -398,6 +423,15 @@ export default function Despensa({ user }) {
       <TipDeEli>
         anota incluso los ingredientes que usas «un poquito». Cuando sumas todo, esos costos chicos también cuentan y te ayudan a poner un precio justo.
       </TipDeEli>
+
+      {/* Modal Upsell / Promoción PRO */}
+      <ModalUpsell
+        isOpen={showUpsell}
+        onClose={() => setShowUpsell(false)}
+        modo={upsellModo}
+        onIrALogin={onIrALogin}
+        onIrASuscripcion={onIrASuscripcion}
+      />
     </div>
   )
 }
