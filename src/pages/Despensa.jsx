@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+﻿import React, { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { factorBase, unidadBaseDe, CLP } from '../utils/conversores'
 import { EncabezadoPagina } from '../components/ui/EncabezadoPagina'
@@ -76,8 +76,8 @@ export default function Despensa({ user, isPro = false, onIrALogin, onIrASuscrip
       return
     }
 
-    // 2. Si es usuario Gratis y va a crear un ingrediente nuevo -> Verificar límite de 5
-    if (!isPro && !editId && ingredientes.length >= 5) {
+    // 2. Si es usuario Gratis y va a crear un ingrediente nuevo -> Verificar límite de 10
+    if (!isPro && !editId && ingredientes.length >= 10) {
       setUpsellModo('limit_despensa')
       setShowUpsell(true)
       return

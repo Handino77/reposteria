@@ -1,4 +1,4 @@
-import React from 'react'
+﻿import React from 'react'
 import { Crown, LogIn, Sparkles, X, CheckCircle2 } from 'lucide-react'
 import { Boton } from './ui/Boton'
 
@@ -75,7 +75,7 @@ export function ModalUpsell({
 
           {esDespensa && (
             <p>
-              Has alcanzado el límite de <b>5 ingredientes</b> de la versión gratuita. Para guardar ingredientes ilimitados y tener tus costos siempre al día, suscríbete al Plan PRO.
+              Has alcanzado el límite de <b>10 ingredientes</b> de la versión gratuita. Para guardar ingredientes ilimitados y tener tus costos siempre al día, suscríbete al Plan PRO.
             </p>
           )}
 
