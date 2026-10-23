@@ -204,17 +204,17 @@ export default function Despensa({ user, isPro = false, onIrALogin, onIrASuscrip
 
       {/* Resumen de tu despensa */}
       {ingredientes.length === 0 ? (
-        <section aria-label="Resumen de tu despensa">
-          <div className="bg-[var(--superficie)] border border-[var(--linea)] rounded-[16px] p-5 md:p-6 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-[var(--sombra-panel)]">
-            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-3.5 text-center sm:text-left min-w-0 w-full">
+        <section aria-label="Resumen de tu despensa" className="w-full">
+          <div className="bg-[var(--superficie)] border border-[var(--linea)] rounded-[16px] p-5 md:p-6 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-[var(--sombra-panel)] w-full overflow-hidden">
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-3.5 text-center sm:text-left min-w-0 flex-1 w-full">
               <div className="w-10 h-10 rounded-full bg-[var(--vino-suave)] flex items-center justify-center shrink-0 text-base">
                 💛
               </div>
-              <div className="min-w-0">
-                <h3 className="font-serif text-[15px] sm:text-[16px] md:text-[18px] font-bold text-[var(--tinta)] leading-snug break-words">
+              <div className="min-w-0 flex-1">
+                <h3 className="font-serif text-[15px] sm:text-[16px] md:text-[18px] font-bold text-[var(--tinta)] leading-snug break-words max-w-full">
                   Tu despensa está vacía — empecemos con tu primer ingrediente 💛
                 </h3>
-                <p className="text-xs text-[var(--tinta-suave)] mt-1 leading-relaxed">
+                <p className="text-xs text-[var(--tinta-suave)] mt-1 leading-relaxed max-w-full">
                   Registra lo básico que usas a diario para empezar a calcular tus costos reales.
                 </p>
               </div>
@@ -225,7 +225,7 @@ export default function Despensa({ user, isPro = false, onIrALogin, onIrASuscrip
                 formRef.current?.scrollIntoView({ behavior: 'smooth' })
                 setTimeout(() => nombreInputRef.current?.focus(), 300)
               }}
-              className="shrink-0 w-full sm:w-auto"
+              className="shrink-0 w-full sm:w-auto max-w-full"
             >
               <Plus className="w-4 h-4 stroke-[2.2]" />
               <span>Agregar mi primer ingrediente</span>
