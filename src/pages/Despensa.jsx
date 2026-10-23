@@ -131,6 +131,9 @@ export default function Despensa({ user, isPro = false, onIrALogin, onIrASuscrip
 
       cancelarEdicion()
       fetchDespensa()
+      setTimeout(() => {
+        nombreInputRef.current?.focus()
+      }, 0)
     } catch (err) {
       console.error('Error al guardar ingrediente:', err)
       showToast('Error al guardar en Supabase: ' + err.message)
