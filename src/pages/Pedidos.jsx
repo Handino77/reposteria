@@ -452,7 +452,7 @@ export default function Pedidos({ user, isPro = false, onIrALogin, onIrASuscripc
         <div className="grid grid-cols-7 divide-x divide-y divide-[var(--linea-suave)]">
             {diasMatriz.map((fechaObj, idx) => {
               if (!fechaObj) {
-                return <div key={`empty-${idx}`} className="bg-[var(--superficie-2)]/40 min-h-[90px] md:min-h-[120px]" />
+                return <div key={`empty-${idx}`} className="bg-[var(--superficie-2)]/40 min-h-[64px] md:min-h-[90px]" />
               }
 
               const fechaStr = fmtFecha(fechaObj)
@@ -463,7 +463,7 @@ export default function Pedidos({ user, isPro = false, onIrALogin, onIrASuscripc
                 <div
                   key={fechaStr}
                   onClick={() => handleRequirePro(() => setModalFecha(fechaStr))}
-                  className={`min-h-[90px] md:min-h-[120px] p-2 flex flex-col justify-between transition-colors cursor-pointer hover:bg-[var(--superficie-2)] ${
+                  className={`min-h-[64px] md:min-h-[90px] p-2 flex flex-col justify-between transition-colors cursor-pointer hover:bg-[var(--superficie-2)] ${
                     esHoy ? 'bg-[var(--vino-suave)]/30' : 'bg-[var(--superficie)]'
                   }`}
                 >
