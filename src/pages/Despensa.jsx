@@ -308,7 +308,7 @@ export default function Despensa({ user, isPro = false, onIrALogin, onIrASuscrip
                   type="number"
                   step="any"
                   required
-                  placeholder="1200"
+                  placeholder="12000"
                   className="num pl-7"
                   value={precio}
                   onChange={(e) => setPrecio(e.target.value)}
