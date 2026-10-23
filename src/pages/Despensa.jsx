@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react'
+﻿import React, { useState, useEffect, useRef } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { factorBase, unidadBaseDe, CLP } from '../utils/conversores'
 import { EncabezadoPagina } from '../components/ui/EncabezadoPagina'
@@ -28,6 +28,8 @@ export default function Despensa({ user, isPro = false, onIrALogin, onIrASuscrip
   const [unidad, setUnidad] = useState('kg')
   const [precio, setPrecio] = useState('')
   const [toastMsg, setToastMsg] = useState('')
+  const nombreInputRef = useRef(null)
+  const formRef = useRef(null)
 
   useEffect(() => {
     fetchDespensa()
@@ -197,40 +199,72 @@ export default function Despensa({ user, isPro = false, onIrALogin, onIrASuscrip
         introduccion="Ten a mano tus costos reales y deja de adivinar cuánto te cuesta cada ingrediente. Lo demás lo calculamos nosotras."
       />
 
-      {/* Tarjetas de Indicadores */}
-      <section aria-label="Resumen de tu despensa" className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-        <TarjetaIndicador
-          etiqueta="Ingredientes registrados"
-          valor={ingredientes.length}
-          nota="en tu despensa"
-        />
-        <TarjetaIndicador
-          etiqueta="Estado del registro"
-          valor={ingredientes.length > 0 ? "Al día" : "Vacía"}
-          insignia={ingredientes.length > 0 ? "Al día" : undefined}
-          nota={ingredientes.length === 0 ? "Sin datos" : undefined}
-        />
-        <TarjetaIndicador
-          etiqueta="Ingrediente más valioso"
-          valor={masCaro ? masCaro.nombre : "—"}
-          nota={masCaro ? `${CLP(masCaro.costo_base, 2)} / ${masCaro.unidad_base}` : "—"}
-        />
-      </section>
+      {/* Resumen de tu despensa */}
+      {ingredientes.length === 0 ? (
+        <section aria-label="Resumen de tu despensa">
+          <div className="bg-[var(--superficie)] border border-[var(--linea)] rounded-[16px] p-5 md:p-6 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-[var(--sombra-panel)]">
+            <div className="flex items-center gap-3.5 text-center sm:text-left">
+              <div className="w-10 h-10 rounded-full bg-[var(--vino-suave)] flex items-center justify-center shrink-0 text-base">
+                💛
+              </div>
+              <div>
+                <h3 className="font-serif text-[16px] md:text-[18px] font-bold text-[var(--tinta)]">
+                  Tu despensa está vacía — empecemos con tu primer ingrediente 💛
+                </h3>
+                <p className="text-xs text-[var(--tinta-suave)] mt-0.5">
+                  Registra lo básico que usas a diario para empezar a calcular tus costos reales.
+                </p>
+              </div>
+            </div>
+            <Boton
+              variante="principal"
+              onClick={() => {
+                formRef.current?.scrollIntoView({ behavior: 'smooth' })
+                setTimeout(() => nombreInputRef.current?.focus(), 300)
+              }}
+              className="shrink-0 w-full sm:w-auto"
+            >
+              <Plus className="w-4 h-4 stroke-[2.2]" />
+              <span>Agregar mi primer ingrediente</span>
+            </Boton>
+          </div>
+        </section>
+      ) : (
+        <section aria-label="Resumen de tu despensa" className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+          <TarjetaIndicador
+            etiqueta="Ingredientes registrados"
+            valor={ingredientes.length}
+            nota="en tu despensa"
+          />
+          <TarjetaIndicador
+            etiqueta="Estado del registro"
+            valor="Al día"
+            insignia="Al día"
+          />
+          <TarjetaIndicador
+            etiqueta="Ingrediente más valioso"
+            valor={masCaro ? masCaro.nombre : "—"}
+            nota={masCaro ? `${CLP(masCaro.costo_base, 2)} / ${masCaro.unidad_base}` : "—"}
+          />
+        </section>
+      )}
 
       {/* Panel Formulario: Agregar / Editar ingrediente */}
       <Panel
         titulo={editId ? 'Editar ingrediente' : 'Agregar un ingrediente'}
         subtitulo="Anota el formato que realmente compras y calculamos solas su costo base."
       >
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3.5">
             <Campo id="g-nom" label="Ingrediente">
-              <Input
+              <input
+                ref={nombreInputRef}
                 id="g-nom"
                 required
                 placeholder="Ej. Chocolate cobertura 55%"
                 value={nombre}
                 onChange={(e) => setNombre(e.target.value)}
+                className="h-[44px] border border-[#DFD3C7] bg-[var(--superficie-2)] rounded-[11px] px-3 font-sans text-[13.5px] text-[var(--tinta)] outline-none transition-all focus:border-[var(--vino-borde)] focus:ring-2 focus:ring-[var(--vino)]/10 disabled:opacity-50 w-full"
               />
             </Campo>
 
@@ -311,20 +345,22 @@ export default function Despensa({ user, isPro = false, onIrALogin, onIrASuscrip
           </div>
 
           {/* Buscador de Ingredientes */}
-          <div className="relative w-full sm:w-[240px]">
-            <Search className="w-3.5 h-3.5 absolute left-3 top-3 text-[var(--tinta-tenue)] stroke-[1.8]" />
-            <label htmlFor="g-busca" className="sr-only">
-              Buscar ingrediente
-            </label>
-            <input
-              id="g-busca"
-              type="search"
-              placeholder="Buscar ingrediente"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-9 border border-[var(--linea)] rounded-[10px] bg-white pl-8 pr-3 font-sans text-xs text-[var(--tinta)] outline-none focus:border-[var(--vino-borde)] focus:ring-2 focus:ring-[var(--vino)]/10"
-            />
-          </div>
+          {ingredientes.length > 0 && (
+            <div className="relative w-full sm:w-[240px]">
+              <Search className="w-3.5 h-3.5 absolute left-3 top-3 text-[var(--tinta-tenue)] stroke-[1.8]" />
+              <label htmlFor="g-busca" className="sr-only">
+                Buscar ingrediente
+              </label>
+              <input
+                id="g-busca"
+                type="search"
+                placeholder="Buscar ingrediente"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full h-9 border border-[var(--linea)] rounded-[10px] bg-white pl-8 pr-3 font-sans text-xs text-[var(--tinta)] outline-none focus:border-[var(--vino-borde)] focus:ring-2 focus:ring-[var(--vino)]/10"
+              />
+            </div>
+          )}
         </div>
 
         {loading ? (
@@ -421,7 +457,9 @@ export default function Despensa({ user, isPro = false, onIrALogin, onIrASuscrip
 
       {/* Tip de Eli */}
       <TipDeEli>
-        anota incluso los ingredientes que usas «un poquito». Cuando sumas todo, esos costos chicos también cuentan y te ayudan a poner un precio justo.
+        {ingredientes.length === 0
+          ? 'empecemos por lo que más usas — la harina, los huevos, la mantequilla. Con 5 o 6 ingredientes ya puedes calcular tu primer receta. 💛'
+          : 'anota incluso los ingredientes que usas «un poquito». Cuando sumas todo, esos costos chicos también cuentan y te ayudan a poner un precio justo.'}
       </TipDeEli>
 
       {/* Modal Upsell / Promoción PRO */}
