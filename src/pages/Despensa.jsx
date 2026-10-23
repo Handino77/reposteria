@@ -206,15 +206,15 @@ export default function Despensa({ user, isPro = false, onIrALogin, onIrASuscrip
       {ingredientes.length === 0 ? (
         <section aria-label="Resumen de tu despensa">
           <div className="bg-[var(--superficie)] border border-[var(--linea)] rounded-[16px] p-5 md:p-6 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-[var(--sombra-panel)]">
-            <div className="flex items-center gap-3.5 text-center sm:text-left">
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-3.5 text-center sm:text-left min-w-0 w-full">
               <div className="w-10 h-10 rounded-full bg-[var(--vino-suave)] flex items-center justify-center shrink-0 text-base">
                 💛
               </div>
-              <div>
-                <h3 className="font-serif text-[16px] md:text-[18px] font-bold text-[var(--tinta)]">
+              <div className="min-w-0">
+                <h3 className="font-serif text-[15px] sm:text-[16px] md:text-[18px] font-bold text-[var(--tinta)] leading-snug break-words">
                   Tu despensa está vacía — empecemos con tu primer ingrediente 💛
                 </h3>
-                <p className="text-xs text-[var(--tinta-suave)] mt-0.5">
+                <p className="text-xs text-[var(--tinta-suave)] mt-1 leading-relaxed">
                   Registra lo básico que usas a diario para empezar a calcular tus costos reales.
                 </p>
               </div>
