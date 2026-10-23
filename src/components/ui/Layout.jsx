@@ -65,7 +65,7 @@ export function Layout({
                 Kit de la Repostera
               </div>
               <div className="text-[10px] text-[var(--tinta-suave)] mt-0.5 tracking-[0.09em] uppercase font-medium">
-                por Cifu Repostera
+                por Cifu Pasticceria
               </div>
             </div>
           </div>
@@ -128,7 +128,7 @@ export function Layout({
               </div>
               <div className="min-w-0 flex-1">
                 <div className="text-[12.5px] font-semibold text-[var(--tinta)] truncate">
-                  Eli · Cifu Repostera
+                  Eli · Cifu Pasticceria
                 </div>
                 <div className="text-[11px] text-[var(--tinta-suave)] truncate">
                   Tu mentora repostera 💖
@@ -138,7 +138,7 @@ export function Layout({
                     href="https://www.tiktok.com/@cifu_pasticceria"
                     target="_blank"
                     rel="noopener noreferrer"
-                    title="TikTok de Cifu Repostera"
+                    title="TikTok de Cifu Pasticceria"
                     className="text-[var(--tinta-suave)] hover:text-[var(--vino)] transition-colors p-0.5"
                   >
                     <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
@@ -149,7 +149,7 @@ export function Layout({
                     href="https://www.instagram.com/cifu_pasticceria/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    title="Instagram de Cifu Repostera"
+                    title="Instagram de Cifu Pasticceria"
                     className="text-[var(--tinta-suave)] hover:text-[var(--vino)] transition-colors p-0.5"
                   >
                     <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
@@ -218,7 +218,7 @@ export function Layout({
                 Kit de la Repostera
               </div>
               <div className="text-[9.5px] text-[var(--tinta-suave)] tracking-[0.09em] uppercase mt-0.5">
-                por Cifu Repostera
+                por Cifu Pasticceria
               </div>
             </div>
           </div>
@@ -228,7 +228,7 @@ export function Layout({
               href="https://www.tiktok.com/@cifu_pasticceria"
               target="_blank"
               rel="noopener noreferrer"
-              title="TikTok de Cifu Repostera"
+              title="TikTok de Cifu Pasticceria"
               className="text-[var(--tinta-suave)] hover:text-[var(--vino)] p-1 transition-colors"
             >
               <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
@@ -239,7 +239,7 @@ export function Layout({
               href="https://www.instagram.com/cifu_pasticceria/"
               target="_blank"
               rel="noopener noreferrer"
-              title="Instagram de Cifu Repostera"
+              title="Instagram de Cifu Pasticceria"
               className="text-[var(--tinta-suave)] hover:text-[var(--vino)] p-1 transition-colors"
             >
               <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">

@@ -289,7 +289,7 @@ export default function ListaComprasModal({ isOpen, onClose, pedidosList, receta
       fechaFmt = ` (${d1}/${m1}/${y1} al ${d2}/${m2}/${y2})`
     }
 
-    let texto = `🛒 *Lista de Compras de Cifu Repostera*${fechaFmt}\n` +
+    let texto = `🛒 *Lista de Compras de Cifu Pasticceria*${fechaFmt}\n` +
       `Hecha con todo el cariño para preparar tus pedidos 💖🧁\n\n`
 
     let compradosCount = 0
@@ -375,7 +375,7 @@ export default function ListaComprasModal({ isOpen, onClose, pedidosList, receta
             </span>
             <h3 className="font-serif-title text-xl font-semibold text-[var(--tinta)] flex items-center gap-2 mt-0.5">
               <ShoppingBag className="w-5 h-5 text-[var(--oro)]" />
-              🛒 Lista de Compras de Cifu Repostera
+              🛒 Lista de Compras de Cifu Pasticceria
             </h3>
           </div>
           <Boton variante="icono" size="icono" onClick={onClose} ariaLabel="Cerrar modal">
