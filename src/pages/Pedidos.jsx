@@ -387,7 +387,7 @@ export default function Pedidos({ user, isPro = false, onIrALogin, onIrASuscripc
           <div className="flex items-center gap-2.5">
             <Crown className="w-5 h-5 shrink-0 text-[var(--oro)]" />
             <span>
-              <b>Funciones exclusivas del Plan PRO:</b> El calendario de encargos y las listas de compras automáticas para WhatsApp requieren la suscripción PRO ($3.000 CLP/mes).
+              <b>Funciones exclusivas del Plan PRO:</b> El calendario de encargos y las listas de compras automáticas para WhatsApp requieren la suscripción PRO ($3.500 CLP/mes).
             </span>
           </div>
           <Boton variante="oro" size="sm" onClick={() => handleRequirePro(() => {})}>

@@ -148,7 +148,7 @@ serve(async (req) => {
           }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
         }
 
-        const planId = 'plan_kit_repostera_3000'
+        const planId = 'plan_kit_repostera_3500'
 
         // Crear suscripción activa en Flow
         const subRes = await callFlowApi(
@@ -211,7 +211,7 @@ serve(async (req) => {
               repostera_id: repostera.id,
               flow_token: token,
               flow_charge_id: subRes?.invoices?.[0]?.id ? String(subRes.invoices[0].id) : subId,
-              monto: 3000,
+              monto: 3500,
               estado: 'pagado'
             }
           ])
@@ -245,7 +245,7 @@ serve(async (req) => {
       console.log('✅ Verificado estado de pago recurrente (payment/getStatus):', paymentStatus)
 
       const customerId = paymentStatus.payer || paymentStatus.customerId
-      const monto = paymentStatus.amount || 3000
+      const monto = paymentStatus.amount || 3500
 
       let { data: repostera } = await supabase
         .from('reposteras')

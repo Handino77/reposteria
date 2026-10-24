@@ -1,4 +1,4 @@
-﻿import React from 'react'
+import React from 'react'
 import { Crown, LogIn, Sparkles, X, CheckCircle2 } from 'lucide-react'
 import { Boton } from './ui/Boton'
 
@@ -87,7 +87,7 @@ export function ModalUpsell({
 
           {esPedido && (
             <p>
-              El calendario de pedidos y la generación automática de listas de compras para WhatsApp son funciones exclusivas del <b>Plan PRO ($3.000 CLP/mes)</b>.
+              El calendario de pedidos y la generación automática de listas de compras para WhatsApp son funciones exclusivas del <b>Plan PRO ($3.500 CLP/mes)</b>.
             </p>
           )}
         </div>
@@ -135,7 +135,7 @@ export function ModalUpsell({
                 }}
               >
                 <Crown className="w-4 h-4 mr-2" />
-                Obtener Plan PRO ($3.000 CLP/mes)
+                Obtener Plan PRO ($3.500 CLP/mes)
               </Boton>
               {onIrALogin && (
                 <button

@@ -228,7 +228,7 @@ export default function Suscripcion({ user }) {
       <EncabezadoPagina
         antetitulo="Hecho con cariño por Eli 💖"
         titulo="Mi Suscripción PRO"
-        introduccion={`Gestiona tu plan mensual de ${CLP(3000, 0)} CLP/mes para acceder a todas las funciones avanzadas.`}
+        introduccion={`Gestiona tu plan mensual de ${CLP(3500, 0)} CLP/mes para acceder a todas las funciones avanzadas.`}
       />
 
       {loading ? (
@@ -246,7 +246,7 @@ export default function Suscripcion({ user }) {
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[var(--linea-suave)] pb-4 mb-6">
                 <div>
                   <span className="text-xs font-bold uppercase tracking-wider text-[var(--tinta-suave)]">Plan Actual</span>
-                  <h3 className="text-xl font-bold text-[var(--tinta)]">Kit Repostera PRO ({CLP(3000, 0)} CLP / mes)</h3>
+                  <h3 className="text-xl font-bold text-[var(--tinta)]">Kit Repostera PRO ({CLP(3500, 0)} CLP / mes)</h3>
                 </div>
 
                 {/* Badge Estado */}
@@ -307,7 +307,7 @@ export default function Suscripcion({ user }) {
                     disabled={processing}
                   >
                     {processing ? <Loader2 className="w-4 h-4 animate-spin" /> : <CreditCard className="w-4 h-4" />}
-                    <span>Actualizar Tarjeta ({CLP(3000, 0)} CLP/mes)</span>
+                    <span>Actualizar Tarjeta ({CLP(3500, 0)} CLP/mes)</span>
                   </Boton>
                 </div>
               ) : (
@@ -328,7 +328,7 @@ export default function Suscripcion({ user }) {
                     disabled={processing}
                   >
                     {processing ? <Loader2 className="w-4 h-4 animate-spin" /> : <CreditCard className="w-4 h-4" />}
-                    <span>Suscribirme con Tarjeta ({CLP(3000, 0)} CLP/mes)</span>
+                    <span>Suscribirme con Tarjeta ({CLP(3500, 0)} CLP/mes)</span>
                   </Boton>
                 </div>
               )}
@@ -374,7 +374,7 @@ export default function Suscripcion({ user }) {
                   {pagos.map((p) => (
                     <div key={p.id} className="pt-2 flex justify-between items-center">
                       <div>
-                        <p className="font-semibold text-[var(--tinta)]">{CLP(p.monto || 3000, 0)}</p>
+                        <p className="font-semibold text-[var(--tinta)]">{CLP(p.monto || 3500, 0)}</p>
                         <p className="text-[10px] text-[var(--tinta-suave)]">
                           {new Date(p.creado_en || p.fecha).toLocaleDateString()}
                         </p>
