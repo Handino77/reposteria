@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { normalizarTextoFlex } from '../utils/conversores'
 import { EncabezadoPagina } from '../components/ui/EncabezadoPagina'
 import { Panel } from '../components/ui/Panel'
-import { Campo, Input, Select } from '../components/ui/Campo'
+import { Campo, Input, Select, Textarea } from '../components/ui/Campo'
 import { Boton } from '../components/ui/Boton'
 import { Pastilla } from '../components/ui/Pastilla'
-import { BookOpen, Plus, Trash2, Edit2, Calculator, Search, Loader2, Sparkles, CheckCircle2 } from 'lucide-react'
+import { BookOpen, Plus, Trash2, Edit2, Calculator, Search, Loader2, Sparkles, CheckCircle2, ChevronDown, ChevronUp } from 'lucide-react'
 import { ModalUpsell } from '../components/ModalUpsell'
 
 export default function Recetas({ user, isPro = false, onCostearReceta, onIrALogin, onIrASuscripcion }) {
@@ -16,6 +16,9 @@ export default function Recetas({ user, isPro = false, onCostearReceta, onIrALog
   const [saving, setSaving] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
 
+  const formRef = useRef(null)
+  const nombreInputRef = useRef(null)
+
   // Estado Modal Upsell
   const [showUpsell, setShowUpsell] = useState(false)
   const [upsellModo, setUpsellModo] = useState('login')
@@ -24,7 +27,9 @@ export default function Recetas({ user, isPro = false, onCostearReceta, onIrALog
   const [editId, setEditId] = useState(null)
   const [nombre, setNombre] = useState('')
   const [rinde, setRinde] = useState('12')
+  const [pasoAPaso, setPasoAPaso] = useState('')
   const [ingredientesLinea, setIngredientesLinea] = useState([])
+  const [recetasAbiertas, setRecetasAbiertas] = useState({})
 
   // Fila actual de ingrediente en edición
   const [ingNombre, setIngNombre] = useState('')
@@ -42,6 +47,13 @@ export default function Recetas({ user, isPro = false, onCostearReceta, onIrALog
   const showToast = (msg) => {
     setToastMsg(msg)
     setTimeout(() => setToastMsg(''), 3000)
+  }
+
+  const togglePasoAPaso = (recetaId) => {
+    setRecetasAbiertas((prev) => ({
+      ...prev,
+      [recetaId]: !prev[recetaId]
+    }))
   }
 
   const fetchRecetasYDespensa = async () => {
@@ -217,6 +229,7 @@ export default function Recetas({ user, isPro = false, onCostearReceta, onIrALog
     try {
       setSaving(true)
       const rindeNum = parseFloat(rinde)
+      const pasoAPasoValor = pasoAPaso.trim() || null
 
       if (editId) {
         // Actualizar receta existente
@@ -224,7 +237,8 @@ export default function Recetas({ user, isPro = false, onCostearReceta, onIrALog
           .from('recetas')
           .update({
             nombre: nombre.trim(),
-            rinde: rindeNum
+            rinde: rindeNum,
+            paso_a_paso: pasoAPasoValor
           })
           .eq('id', editId)
 
@@ -263,7 +277,8 @@ export default function Recetas({ user, isPro = false, onCostearReceta, onIrALog
             {
               repostera_id: user.id,
               nombre: nombre.trim(),
-              rinde: rindeNum
+              rinde: rindeNum,
+              paso_a_paso: pasoAPasoValor
             }
           ])
           .select()
@@ -304,6 +319,7 @@ export default function Recetas({ user, isPro = false, onCostearReceta, onIrALog
     setEditId(receta.id)
     setNombre(receta.nombre)
     setRinde(receta.rinde)
+    setPasoAPaso(receta.paso_a_paso || '')
     setIngredientesLinea(
       (receta.receta_ingredientes || []).map((i) => ({
         nombre: i.nombre,
@@ -318,6 +334,7 @@ export default function Recetas({ user, isPro = false, onCostearReceta, onIrALog
     setEditId(null)
     setNombre('')
     setRinde('12')
+    setPasoAPaso('')
     setIngredientesLinea([])
     setIngNombre('')
     setIngCant('')
@@ -362,266 +379,343 @@ export default function Recetas({ user, isPro = false, onCostearReceta, onIrALog
       <EncabezadoPagina
         antetitulo="Hecho con cariño por Eli 💖"
         titulo="Mis recetas"
-        introduccion="Guarda tus recetas con sus ingredientes y rendimiento. Podrás costearlas en un clic."
+        introduccion="Guarda tus recetas con sus ingredientes, rendimiento y paso a paso. Podrás costearlas en un clic."
       />
 
-      {/* Buscador de recetas */}
-      <div className="relative">
-        <Search className="w-3.5 h-3.5 absolute left-3.5 top-3.5 text-[var(--tinta-tenue)] stroke-[1.8]" />
-        <label htmlFor="rec-busca" className="sr-only">
-          Buscar receta por nombre
-        </label>
-        <Input
-          id="rec-busca"
-          type="search"
-          placeholder="Buscar receta por nombre..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-9"
-        />
-      </div>
+      {/* Buscador de recetas (solo si hay recetas cargadas) */}
+      {recetas.length > 0 && (
+        <div className="relative">
+          <Search className="w-3.5 h-3.5 absolute left-3.5 top-3.5 text-[var(--tinta-tenue)] stroke-[1.8]" />
+          <label htmlFor="rec-busca" className="sr-only">
+            Buscar receta por nombre
+          </label>
+          <Input
+            id="rec-busca"
+            type="search"
+            placeholder="Buscar receta por nombre..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-9"
+          />
+        </div>
+      )}
 
-      {/* Listado de Recetas */}
+      {/* Listado de Recetas o Estado Vacío */}
       <div className="space-y-3.5">
         {loading ? (
           <div className="bg-[var(--superficie)] p-8 rounded-[18px] border border-[var(--linea)] text-center text-[var(--tinta-suave)] flex flex-col items-center gap-2">
             <Loader2 className="w-6 h-6 animate-spin text-[var(--vino)]" />
             <span className="text-xs">Cargando tus recetas...</span>
           </div>
+        ) : recetas.length === 0 ? (
+          <section aria-label="Recetario vacío" className="w-full">
+            <div className="bg-[var(--superficie)] border border-[var(--linea)] rounded-[16px] p-5 md:p-6 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-[var(--sombra-panel)] w-full overflow-hidden">
+              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-3.5 text-center sm:text-left min-w-0 flex-1 w-full">
+                <div className="w-10 h-10 rounded-full bg-[var(--vino-suave)] flex items-center justify-center shrink-0 text-base">
+                  📖
+                </div>
+                <div className="min-w-0 flex-1">
+                  <h3 className="font-serif text-[15px] sm:text-[16px] md:text-[18px] font-bold text-[var(--tinta)] leading-snug break-words max-w-full">
+                    Aún no guardas ninguna receta — ¡anota tu primera delicia! 🧁
+                  </h3>
+                  <p className="text-xs text-[var(--tinta-suave)] mt-1 leading-relaxed max-w-full">
+                    Guarda tus ingredientes, proporciones y paso a paso para costearla o escalarla cuando quieras.
+                  </p>
+                </div>
+              </div>
+              <Boton
+                variante="principal"
+                onClick={() => {
+                  formRef.current?.scrollIntoView({ behavior: 'smooth' })
+                  setTimeout(() => nombreInputRef.current?.focus(), 300)
+                }}
+                className="shrink-0 w-full sm:w-auto max-w-full"
+              >
+                <Plus className="w-4 h-4 stroke-[2.2]" />
+                <span>Crear mi primera receta</span>
+              </Boton>
+            </div>
+          </section>
         ) : recetasFiltradas.length === 0 ? (
           <div className="bg-[var(--superficie)] p-8 rounded-[18px] border border-[var(--linea)] text-center text-xs text-[var(--tinta-suave)]">
-            {recetas.length === 0
-              ? 'Aún no guardas ninguna receta. ¡Anota la primera abajo!'
-              : `No se encontraron recetas para "${searchQuery}"`}
+            No se encontraron recetas para "{searchQuery}"
           </div>
         ) : (
-          recetasFiltradas.map((r) => (
-            <Panel
-              key={r.id}
-              titulo={r.nombre}
-              subtitulo={`Rinde: ${r.rinde} porciones/unidades · ${(r.receta_ingredientes || []).length} ingredientes`}
-              acciones={
-                <div className="flex items-center gap-1.5">
-                  <Boton
-                    variante="marca-secundario"
-                    size="sm"
-                    onClick={() => onCostearReceta && onCostearReceta(r)}
-                  >
-                    <Calculator className="w-3.5 h-3.5 stroke-[2]" />
-                    <span>Costear</span>
-                  </Boton>
-                  <Boton
-                    variante="icono"
-                    size="icono"
-                    onClick={() => handleEdit(r)}
-                    ariaLabel={`Editar ${r.nombre}`}
-                  >
-                    <Edit2 className="w-3.5 h-3.5" />
-                  </Boton>
-                  <Boton
-                    variante="icono"
-                    size="icono"
-                    onClick={() => handleDelete(r.id, r.nombre)}
-                    ariaLabel={`Eliminar ${r.nombre}`}
-                  >
-                    <Trash2 className="w-3.5 h-3.5 text-red-500" />
-                  </Boton>
+          recetasFiltradas.map((r) => {
+            const tienePasoAPaso = Boolean(r.paso_a_paso && r.paso_a_paso.trim())
+            const abierto = Boolean(recetasAbiertas[r.id])
+
+            return (
+              <Panel
+                key={r.id}
+                titulo={r.nombre}
+                subtitulo={`Rinde: ${r.rinde} porciones/unidades · ${(r.receta_ingredientes || []).length} ingredientes`}
+                acciones={
+                  <div className="flex items-center gap-1.5">
+                    <Boton
+                      variante="marca-secundario"
+                      size="sm"
+                      onClick={() => onCostearReceta && onCostearReceta(r)}
+                    >
+                      <Calculator className="w-3.5 h-3.5 stroke-[2]" />
+                      <span>Costear</span>
+                    </Boton>
+                    <Boton
+                      variante="icono"
+                      size="icono"
+                      onClick={() => handleEdit(r)}
+                      ariaLabel={`Editar ${r.nombre}`}
+                    >
+                      <Edit2 className="w-3.5 h-3.5" />
+                    </Boton>
+                    <Boton
+                      variante="icono"
+                      size="icono"
+                      onClick={() => handleDelete(r.id, r.nombre)}
+                      ariaLabel={`Eliminar ${r.nombre}`}
+                    >
+                      <Trash2 className="w-3.5 h-3.5 text-red-500" />
+                    </Boton>
+                  </div>
+                }
+              >
+                <div className="space-y-3">
+                  {/* Lista de ingredientes de la receta */}
+                  <div className="flex flex-wrap gap-1.5 text-xs text-[var(--tinta-media)]">
+                    {(r.receta_ingredientes || []).map((ing, i) => (
+                      <span
+                        key={i}
+                        className="inline-flex items-center gap-1 bg-[var(--superficie-2)] border border-[var(--linea-suave)] px-2.5 py-1 rounded-[8px] num"
+                      >
+                        <strong className="text-[var(--tinta)]">{ing.nombre}:</strong>{' '}
+                        {ing.cantidad} {ing.unidad}
+                      </span>
+                    ))}
+                  </div>
+
+                  {/* Sección Paso a Paso si existe */}
+                  {tienePasoAPaso && (
+                    <div className="pt-2 border-t border-[var(--linea-suave)]">
+                      <button
+                        type="button"
+                        onClick={() => togglePasoAPaso(r.id)}
+                        className="flex items-center gap-1.5 text-xs font-semibold text-[var(--vino)] hover:text-[var(--vino-oscuro)] transition-colors py-1 cursor-pointer"
+                        aria-expanded={abierto}
+                      >
+                        {abierto ? (
+                          <ChevronUp className="w-3.5 h-3.5 stroke-[2.2]" />
+                        ) : (
+                          <ChevronDown className="w-3.5 h-3.5 stroke-[2.2]" />
+                        )}
+                        <span>{abierto ? 'Ocultar paso a paso' : 'Ver paso a paso y tips'}</span>
+                      </button>
+
+                      {abierto && (
+                        <div className="mt-2 p-3 bg-[var(--superficie-2)] rounded-[11px] border border-[var(--linea-suave)] text-xs text-[var(--tinta)] whitespace-pre-wrap leading-relaxed">
+                          {r.paso_a_paso}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
-              }
-            >
-              {/* Lista de ingredientes de la receta */}
-              <div className="flex flex-wrap gap-1.5 text-xs text-[var(--tinta-media)]">
-                {(r.receta_ingredientes || []).map((ing, i) => (
-                  <span
-                    key={i}
-                    className="inline-flex items-center gap-1 bg-[var(--superficie-2)] border border-[var(--linea-suave)] px-2.5 py-1 rounded-[8px] num"
-                  >
-                    <strong className="text-[var(--tinta)]">{ing.nombre}:</strong>{' '}
-                    {ing.cantidad} {ing.unidad}
-                  </span>
-                ))}
-              </div>
-            </Panel>
-          ))
+              </Panel>
+            )
+          })
         )}
       </div>
 
       {/* Formulario Nueva / Editar Receta */}
-      <Panel
-        titulo={editId ? 'Editar receta' : 'Nueva receta'}
-        subtitulo="Ingresa los datos generales y los ingredientes que componen esta mezcla."
-      >
-        <form onSubmit={handleSaveReceta} className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-            <div className="sm:col-span-2">
-              <Campo id="rec-nombre" label="Nombre de la Receta">
-                <Input
-                  id="rec-nombre"
-                  type="text"
-                  required
-                  placeholder="Ej: Alfajores de maicena"
-                  value={nombre}
-                  onChange={(e) => setNombre(e.target.value)}
-                />
-              </Campo>
-            </div>
-
-            <div>
-              <Campo id="rec-rinde" label="Rendimiento (unidades)">
-                <Input
-                  id="rec-rinde"
-                  type="number"
-                  step="any"
-                  required
-                  placeholder="Ej: 12"
-                  className="num font-semibold"
-                  value={rinde}
-                  onChange={(e) => setRinde(e.target.value)}
-                />
-              </Campo>
-            </div>
-          </div>
-
-          {/* Añadir ingrediente a la lista temporal */}
-          <div className="p-4 bg-[var(--superficie-2)] rounded-[14px] border border-[var(--linea-suave)] space-y-3">
-            <label className="block text-[11.5px] font-bold uppercase tracking-[0.08em] text-[var(--tinta)]">
-              Agregar Ingredientes
-            </label>
-
-            <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+      <div ref={formRef}>
+        <Panel
+          titulo={editId ? 'Editar receta' : 'Nueva receta'}
+          subtitulo="Ingresa los datos generales, los ingredientes y el paso a paso de tu preparación."
+        >
+          <form onSubmit={handleSaveReceta} className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
               <div className="sm:col-span-2">
-                <Input
-                  id="rec-ing-nombre"
-                  type="text"
-                  placeholder="Escribe o elige un ingrediente..."
-                  list="lista-despensa-autocompletado"
-                  value={ingNombre}
-                  onChange={(e) => handleIngNombreChange(e.target.value)}
-                />
+                <Campo id="rec-nombre" label="Nombre de la Receta">
+                  <Input
+                    ref={nombreInputRef}
+                    id="rec-nombre"
+                    type="text"
+                    required
+                    placeholder="Ej: Alfajores de maicena"
+                    value={nombre}
+                    onChange={(e) => setNombre(e.target.value)}
+                  />
+                </Campo>
               </div>
 
               <div>
-                <Input
-                  id="rec-ing-cant"
-                  type="number"
-                  step="any"
-                  placeholder="Cantidad"
-                  className="num"
-                  value={ingCant}
-                  onChange={(e) => setIngCant(e.target.value)}
-                />
-              </div>
-
-              <div>
-                <Select
-                  id="rec-ing-unidad"
-                  value={ingUnidad}
-                  onChange={(e) => setIngUnidad(e.target.value)}
-                >
-                  <option value="g">g (gramos)</option>
-                  <option value="kg">kg (kilos)</option>
-                  <option value="ml">ml (mililitros)</option>
-                  <option value="l">l (litros)</option>
-                  <option value="cdta">cucharadita (cdta)</option>
-                  <option value="cda">cucharada (cda)</option>
-                  <option value="taza">taza</option>
-                  <option value="unidad">unidad</option>
-                  <option value="oz">oz (onzas)</option>
-                  <option value="lb">lb (libras)</option>
-                </Select>
+                <Campo id="rec-rinde" label="Rendimiento (unidades)">
+                  <Input
+                    id="rec-rinde"
+                    type="number"
+                    step="any"
+                    required
+                    placeholder="Ej: 12"
+                    className="num font-semibold"
+                    value={rinde}
+                    onChange={(e) => setRinde(e.target.value)}
+                  />
+                </Campo>
               </div>
             </div>
 
-            {/* Banner de sugerencia de enlace */}
-            {sugerenciaDespensa && (
-              <div className="bg-[var(--oro-fondo)] border border-[var(--oro)]/30 rounded-[11px] p-2.5 text-xs text-[var(--tinta)] flex items-center justify-between gap-2">
-                <span className="flex items-center gap-1.5">
-                  <Sparkles className="w-4 h-4 text-[var(--oro)] shrink-0" />
-                  <span>¿Te refieres a <b>"{sugerenciaDespensa.nombre}"</b> de tu despensa?</span>
-                </span>
-                <Boton
-                  variante="principal"
-                  size="sm"
-                  onClick={() => {
-                    setIngNombre(sugerenciaDespensa.nombre)
-                    setSelectedDespensaId(sugerenciaDespensa.id)
-                    setSugerenciaDespensa(null)
-                  }}
-                  className="shrink-0"
-                >
-                  Usar de Despensa
-                </Boton>
-              </div>
-            )}
+            {/* Añadir ingrediente a la lista temporal */}
+            <div className="p-4 bg-[var(--superficie-2)] rounded-[14px] border border-[var(--linea-suave)] space-y-3">
+              <label className="block text-[11.5px] font-bold uppercase tracking-[0.08em] text-[var(--tinta)]">
+                Agregar Ingredientes
+              </label>
 
-            <Boton variante="secundario" size="sm" onClick={handleAddIngredienteLinea}>
-              <Plus className="w-3.5 h-3.5 stroke-[2.2]" />
-              <span>Agregar ingrediente a la mezcla</span>
-            </Boton>
-          </div>
+              <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                <div className="sm:col-span-2">
+                  <Input
+                    id="rec-ing-nombre"
+                    type="text"
+                    placeholder="Escribe o elige un ingrediente..."
+                    list="lista-despensa-autocompletado"
+                    value={ingNombre}
+                    onChange={(e) => handleIngNombreChange(e.target.value)}
+                  />
+                </div>
 
-          {/* Lista de ingredientes agregados */}
-          <div className="space-y-2">
-            <label className="block text-[11.5px] font-bold uppercase tracking-[0.08em] text-[var(--tinta-media)]">
-              Ingredientes en esta receta ({ingredientesLinea.length})
-            </label>
-            {ingredientesLinea.length === 0 ? (
-              <div className="p-4 border border-dashed border-[var(--linea)] rounded-[12px] text-center text-xs text-[var(--tinta-suave)]">
-                Aún no agregas ingredientes a esta receta
-              </div>
-            ) : (
-              <div className="divide-y divide-[var(--linea-suave)] border border-[var(--linea)] rounded-[12px] overflow-hidden">
-                {ingredientesLinea.map((item, idx) => {
-                  const estaEnlazado = !!item.despensa_id
-                  return (
-                    <div key={idx} className="p-3 bg-[var(--superficie)] flex justify-between items-center text-xs md:text-sm">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="font-semibold text-[var(--tinta)]">{item.nombre}</span>
-                        <span className="text-[var(--tinta-suave)] num">
-                          ({item.cantidad} {item.unidad})
-                        </span>
-                        {estaEnlazado ? (
-                          <Pastilla variante="verde">
-                            <CheckCircle2 className="w-3 h-3 stroke-[2]" /> Enlazado
-                          </Pastilla>
-                        ) : (
-                          <Pastilla variante="neutral">
-                            Libre
-                          </Pastilla>
-                        )}
-                      </div>
-                      <Boton
-                        variante="icono"
-                        size="icono"
-                        onClick={() => handleRemoveIngredienteLinea(idx)}
-                        ariaLabel={`Eliminar ${item.nombre}`}
-                      >
-                        <Trash2 className="w-3.5 h-3.5 text-red-500" />
-                      </Boton>
-                    </div>
-                  )
-                })}
-              </div>
-            )}
-          </div>
+                <div>
+                  <Input
+                    id="rec-ing-cant"
+                    type="number"
+                    step="any"
+                    placeholder="Cantidad"
+                    className="num"
+                    value={ingCant}
+                    onChange={(e) => setIngCant(e.target.value)}
+                  />
+                </div>
 
-          <div className="flex items-center gap-2.5 pt-2">
-            {editId && (
-              <Boton variante="secundario" onClick={cancelarEdicion}>
-                Cancelar
-              </Boton>
-            )}
-            <Boton variante="principal" type="submit" disabled={saving}>
-              {saving ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <BookOpen className="w-4 h-4 stroke-[2]" />
+                <div>
+                  <Select
+                    id="rec-ing-unidad"
+                    value={ingUnidad}
+                    onChange={(e) => setIngUnidad(e.target.value)}
+                  >
+                    <option value="g">g (gramos)</option>
+                    <option value="kg">kg (kilos)</option>
+                    <option value="ml">ml (mililitros)</option>
+                    <option value="l">l (litros)</option>
+                    <option value="cdta">cucharadita (cdta)</option>
+                    <option value="cda">cucharada (cda)</option>
+                    <option value="taza">taza</option>
+                    <option value="unidad">unidad</option>
+                    <option value="oz">oz (onzas)</option>
+                    <option value="lb">lb (libras)</option>
+                  </Select>
+                </div>
+              </div>
+
+              {/* Banner de sugerencia de enlace */}
+              {sugerenciaDespensa && (
+                <div className="bg-[var(--oro-fondo)] border border-[var(--oro)]/30 rounded-[11px] p-2.5 text-xs text-[var(--tinta)] flex items-center justify-between gap-2">
+                  <span className="flex items-center gap-1.5">
+                    <Sparkles className="w-4 h-4 text-[var(--oro)] shrink-0" />
+                    <span>¿Te refieres a <b>"{sugerenciaDespensa.nombre}"</b> de tu despensa?</span>
+                  </span>
+                  <Boton
+                    variante="principal"
+                    size="sm"
+                    onClick={() => {
+                      setIngNombre(sugerenciaDespensa.nombre)
+                      setSelectedDespensaId(sugerenciaDespensa.id)
+                      setSugerenciaDespensa(null)
+                    }}
+                    className="shrink-0"
+                  >
+                    Usar de Despensa
+                  </Boton>
+                </div>
               )}
-              <span>{editId ? 'Guardar Cambios' : 'Guardar receta'}</span>
-            </Boton>
-          </div>
-        </form>
-      </Panel>
+
+              <Boton variante="secundario" size="sm" onClick={handleAddIngredienteLinea}>
+                <Plus className="w-3.5 h-3.5 stroke-[2.2]" />
+                <span>Agregar ingrediente a la mezcla</span>
+              </Boton>
+            </div>
+
+            {/* Lista de ingredientes agregados */}
+            <div className="space-y-2">
+              <label className="block text-[11.5px] font-bold uppercase tracking-[0.08em] text-[var(--tinta-media)]">
+                Ingredientes en esta receta ({ingredientesLinea.length})
+              </label>
+              {ingredientesLinea.length === 0 ? (
+                <div className="p-4 border border-dashed border-[var(--linea)] rounded-[12px] text-center text-xs text-[var(--tinta-suave)]">
+                  Aún no agregas ingredientes a esta receta
+                </div>
+              ) : (
+                <div className="divide-y divide-[var(--linea-suave)] border border-[var(--linea)] rounded-[12px] overflow-hidden">
+                  {ingredientesLinea.map((item, idx) => {
+                    const estaEnlazado = !!item.despensa_id
+                    return (
+                      <div key={idx} className="p-3 bg-[var(--superficie)] flex justify-between items-center text-xs md:text-sm">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="font-semibold text-[var(--tinta)]">{item.nombre}</span>
+                          <span className="text-[var(--tinta-suave)] num">
+                            ({item.cantidad} {item.unidad})
+                          </span>
+                          {estaEnlazado ? (
+                            <Pastilla variante="verde">
+                              <CheckCircle2 className="w-3 h-3 stroke-[2]" /> Enlazado
+                            </Pastilla>
+                          ) : (
+                            <Pastilla variante="neutral">
+                              Libre
+                            </Pastilla>
+                          )}
+                        </div>
+                        <Boton
+                          variante="icono"
+                          size="icono"
+                          onClick={() => handleRemoveIngredienteLinea(idx)}
+                          ariaLabel={`Eliminar ${item.nombre}`}
+                        >
+                          <Trash2 className="w-3.5 h-3.5 text-red-500" />
+                        </Boton>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Campo Paso a Paso */}
+            <div>
+              <Campo id="rec-paso-a-paso" label="Paso a Paso (opcional)">
+                <Textarea
+                  id="rec-paso-a-paso"
+                  rows={4}
+                  placeholder="Escribe aquí las instrucciones de preparación, tiempos de horno o tips importantes..."
+                  value={pasoAPaso}
+                  onChange={(e) => setPasoAPaso(e.target.value)}
+                />
+              </Campo>
+            </div>
+
+            <div className="flex items-center gap-2.5 pt-2">
+              {editId && (
+                <Boton variante="secundario" onClick={cancelarEdicion}>
+                  Cancelar
+                </Boton>
+              )}
+              <Boton variante="principal" type="submit" disabled={saving}>
+                {saving ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <BookOpen className="w-4 h-4 stroke-[2]" />
+                )}
+                <span>{editId ? 'Guardar Cambios' : 'Guardar receta'}</span>
+              </Boton>
+            </div>
+          </form>
+        </Panel>
+      </div>
 
       {/* Modal Upsell / Promoción PRO */}
       <ModalUpsell

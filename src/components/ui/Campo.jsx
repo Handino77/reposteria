@@ -36,3 +36,14 @@ export function Select({ id, className = '', children, ...props }) {
     </select>
   )
 }
+
+export function Textarea({ id, className = '', rows = 3, ...props }) {
+  return (
+    <textarea
+      id={id}
+      rows={rows}
+      className={`border border-[#DFD3C7] bg-[var(--superficie-2)] rounded-[11px] p-3 font-sans text-[13.5px] text-[var(--tinta)] outline-none transition-all focus:border-[var(--vino-borde)] focus:ring-2 focus:ring-[var(--vino)]/10 disabled:opacity-50 w-full resize-y ${className}`}
+      {...props}
+    />
+  )
+}
