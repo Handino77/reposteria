@@ -1,6 +1,5 @@
 import React, { useRef, useEffect } from 'react'
 import {
-  Cake,
   Package,
   BookOpen,
   Calculator,
@@ -9,10 +8,12 @@ import {
   Calendar as CalendarIcon,
   Crown,
   LogOut,
-  HelpCircle,
   LogIn,
-  ChevronRight
+  ChevronRight,
+  Sparkles
 } from 'lucide-react'
+import logoWebP from '../../assets/images/logo-cifu.webp'
+import logoPNG from '../../assets/images/logo-cifu.png'
 
 export function Layout({
   activeTab,
@@ -41,6 +42,7 @@ export function Layout({
     { id: 'costos', label: 'Precio justo', icon: Calculator },
     { id: 'escalador', label: 'Ajusta tu receta', icon: Scale },
     { id: 'conversor', label: 'Conversor', icon: RefreshCw },
+    { id: 'rincon', label: 'Rincón de Eli', icon: Sparkles },
     { id: 'pedidos', label: 'Mis pedidos', icon: CalendarIcon, proBadge: !isPro }
   ]
 
@@ -57,9 +59,17 @@ export function Layout({
         <aside className="bg-[var(--superficie)] border-r border-[var(--linea)] p-5 px-[18px] pb-5 flex flex-col h-screen sticky top-0">
           {/* Marca */}
           <div className="flex items-center gap-3 px-2 pb-6 border-b border-[var(--linea-suave)] mb-4">
-            <div className="w-[42px] h-[42px] rounded-[13px] bg-[var(--vino)] text-white flex items-center justify-center shrink-0 shadow-[var(--sombra-boton)]">
-              <Cake className="w-5 h-5 stroke-[1.8]" />
-            </div>
+            <picture className="shrink-0">
+              <source srcSet={logoWebP} type="image/webp" />
+              <img
+                src={logoPNG}
+                alt="Logo Cifu Pasticceria"
+                width={50}
+                height={50}
+                className="w-[50px] h-[50px] rounded-full object-cover"
+                style={{ boxShadow: '0 4px 14px rgba(142,58,88,0.28), 0 0 0 2px rgba(142,58,88,0.30)' }}
+              />
+            </picture>
             <div className="min-w-0">
               <div className="font-serif-title font-semibold text-[17px] leading-snug text-[var(--tinta)]">
                 Kit de la Repostera
@@ -123,9 +133,17 @@ export function Layout({
             </button>
 
             <div className="flex items-center gap-2.5 px-2 pt-1">
-              <div className="w-[34px] h-[34px] rounded-full bg-gradient-to-br from-[#DFB2B8] to-[#A75D77] text-white flex items-center justify-center font-serif-title font-semibold text-[15px] shrink-0">
-                E
-              </div>
+              <picture className="shrink-0">
+                <source srcSet={logoWebP} type="image/webp" />
+                <img
+                  src={logoPNG}
+                  alt="Eli Cifu"
+                  width={34}
+                  height={34}
+                  className="w-[34px] h-[34px] rounded-full object-cover"
+                  style={{ boxShadow: '0 3px 10px rgba(142,58,88,0.30), 0 0 0 2px #8E3A58' }}
+                />
+              </picture>
               <div className="min-w-0 flex-1">
                 <div className="text-[12.5px] font-semibold text-[var(--tinta)] truncate">
                   Eli · Cifu Pasticceria
@@ -210,9 +228,17 @@ export function Layout({
         {/* Header Superior Compacto */}
         <header className="sticky top-0 z-30 bg-[var(--superficie)] border-b border-[var(--linea)] px-4 py-3 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-[10px] bg-[var(--vino)] text-white flex items-center justify-center shrink-0 shadow-sm">
-              <Cake className="w-4 h-4 stroke-[1.8]" />
-            </div>
+            <picture className="shrink-0">
+              <source srcSet={logoWebP} type="image/webp" />
+              <img
+                src={logoPNG}
+                alt="Logo Cifu Pasticceria"
+                width={36}
+                height={36}
+                className="w-9 h-9 rounded-full object-cover"
+                style={{ boxShadow: '0 2px 6px rgba(142,58,88,0.16), 0 0 0 1.5px rgba(224,200,209,0.7)' }}
+              />
+            </picture>
             <div>
               <div className="font-serif-title font-semibold text-base leading-none text-[var(--tinta)]">
                 Kit de la Repostera

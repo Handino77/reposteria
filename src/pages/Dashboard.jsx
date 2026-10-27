@@ -10,6 +10,8 @@ import Escalador from './Escalador'
 import Conversor from './Conversor'
 import Login from './Login'
 import TerminosYPrivacidad from './TerminosYPrivacidad'
+import RinconDeEli from './RinconDeEli'
+import RinconAdmin from './RinconAdmin'
 
 export default function Dashboard({ user }) {
   const [activeTab, setActiveTab] = useState(() => {
@@ -21,6 +23,8 @@ export default function Dashboard({ user }) {
   })
   const [recetaACostear, setRecetaACostear] = useState(null)
   const [estadoSuscripcion, setEstadoSuscripcion] = useState('pendiente')
+  const [isAdmin, setIsAdmin] = useState(false)
+  const [adminMode, setAdminMode] = useState(false) // vista admin del Rincón
 
   useEffect(() => {
     if (!user) {
@@ -33,12 +37,13 @@ export default function Dashboard({ user }) {
       try {
         const { data } = await supabase
           .from('reposteras')
-          .select('estado_suscripcion')
+          .select('estado_suscripcion, es_admin')
           .eq('id', user.id)
           .maybeSingle()
 
         if (isMounted && data) {
           setEstadoSuscripcion(data.estado_suscripcion || 'pendiente')
+          setIsAdmin(data.es_admin === true)
         }
       } catch (err) {
         console.error('Error al obtener estado suscripción:', err)
@@ -56,6 +61,8 @@ export default function Dashboard({ user }) {
   const handleSignOut = async () => {
     await supabase.auth.signOut()
     setActiveTab('despensa')
+    setIsAdmin(false)
+    setAdminMode(false)
   }
 
   const handleCostearRecetaDirecta = (receta) => {
@@ -68,10 +75,16 @@ export default function Dashboard({ user }) {
     setActiveTab('despensa')
   }
 
+  // Al cambiar de tab, salir del modo admin del Rincón
+  const handleSetTab = (tab) => {
+    setAdminMode(false)
+    setActiveTab(tab)
+  }
+
   return (
     <Layout
       activeTab={activeTab}
-      setActiveTab={setActiveTab}
+      setActiveTab={handleSetTab}
       user={user}
       isPro={isPro}
       onSignOut={handleSignOut}
@@ -117,6 +130,18 @@ export default function Dashboard({ user }) {
             user={user}
             onIrALogin={() => setActiveTab('login')}
           />
+        )}
+        {activeTab === 'rincon' && !adminMode && (
+          <RinconDeEli
+            isPro={isPro}
+            isAdmin={isAdmin}
+            user={user}
+            onIrASuscripcion={() => setActiveTab('suscripcion')}
+            onAbrirAdmin={() => setAdminMode(true)}
+          />
+        )}
+        {activeTab === 'rincon' && adminMode && (
+          <RinconAdmin onVolver={() => setAdminMode(false)} />
         )}
         {activeTab === 'privacidad' && (
           <TerminosYPrivacidad volver={() => setActiveTab('suscripcion')} />
