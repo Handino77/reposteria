@@ -315,6 +315,15 @@ function FormPost({ post, onGuardar, onCancelar, alerta, cerrarAlerta }) {
     setImagenPreview(URL.createObjectURL(f))
   }
 
+  // Cálculo automático del tiempo de lectura según el texto
+  useEffect(() => {
+    const textoCompleto = `${datos.titulo || ''} ${datos.extracto || ''} ${datos.contenido || ''} ${datos.tip_eli || ''}`
+    const palabras = textoCompleto.trim().split(/\s+/).filter(Boolean).length
+    // ~180-200 palabras por minuto, mínimo 1 minuto
+    const minutos = Math.max(1, Math.ceil(palabras / 180))
+    setDatos((d) => (d.lectura_minutos === minutos ? d : { ...d, lectura_minutos: minutos }))
+  }, [datos.titulo, datos.extracto, datos.contenido, datos.tip_eli])
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!datos.titulo.trim()) return
@@ -369,11 +378,25 @@ function FormPost({ post, onGuardar, onCancelar, alerta, cerrarAlerta }) {
             onChange={(e) => set('fecha_publicacion', e.target.value)} />
         </div>
 
-        {/* Tiempo */}
+        {/* Tiempo (automático con opción de ajuste) */}
         <div>
-          <label className={labelClass}>Tiempo de lectura (minutos)</label>
-          <input type="number" min={1} max={30} className={campoClass} value={datos.lectura_minutos}
-            onChange={(e) => set('lectura_minutos', Number(e.target.value))} />
+          <label className={labelClass}>
+            Tiempo de lectura estimado
+            <span className="text-[10px] text-[var(--tinta-tenue)] font-normal ml-1.5">(calculado automático)</span>
+          </label>
+          <div className="relative flex items-center">
+            <input
+              type="number"
+              min={1}
+              max={60}
+              className={`${campoClass} pr-12`}
+              value={datos.lectura_minutos}
+              onChange={(e) => set('lectura_minutos', Math.max(1, Number(e.target.value) || 1))}
+            />
+            <span className="absolute right-3.5 text-xs text-[var(--tinta-tenue)] font-medium pointer-events-none">
+              min
+            </span>
+          </div>
         </div>
       </div>
 
