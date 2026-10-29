@@ -226,9 +226,9 @@ export default function PrecioJusto({ recetaPrecargada }) {
       />
 
       {/* Atajo Receta Guardada */}
-      <div className="bg-[var(--superficie)] p-5 rounded-[18px] border border-[var(--oro)]/30 bg-gradient-to-r from-[var(--oro-fondo)]/40 to-transparent space-y-3 shadow-sm">
-        <label className="block text-xs font-bold uppercase tracking-[0.08em] text-[var(--oro)]">
-          ⚡ Atajo: Cargar una receta guardada (x1, x2, x3...)
+      <div className="bg-[var(--superficie)] p-5 rounded-[18px] border border-[var(--linea)] space-y-3 shadow-sm">
+        <label className="block text-base font-bold text-[var(--tinta)]">
+          Atajo: Cargar una receta guardada (x1, x2, x3...)
         </label>
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
           <div className="sm:col-span-2">
@@ -261,7 +261,7 @@ export default function PrecioJusto({ recetaPrecargada }) {
 
           <div>
             <Boton variante="marca-secundario" className="w-full" onClick={handleCargarRecetaSelect}>
-              📥 Cargar
+              Cargar
             </Boton>
           </div>
         </div>
