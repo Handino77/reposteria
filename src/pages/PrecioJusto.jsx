@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+﻿import React, { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { convertirACantidadBase, CLP } from '../utils/conversores'
 import { EncabezadoPagina } from '../components/ui/EncabezadoPagina'
@@ -228,7 +228,7 @@ export default function PrecioJusto({ recetaPrecargada }) {
       {/* Atajo Receta Guardada */}
       <div className="bg-[var(--superficie)] p-5 rounded-[18px] border border-[var(--oro)]/30 bg-gradient-to-r from-[var(--oro-fondo)]/40 to-transparent space-y-3 shadow-sm">
         <label className="block text-xs font-bold uppercase tracking-[0.08em] text-[var(--oro)]">
-          ⚡ Atajo: Cargar una receta guardada con ajuste de tandas
+          ⚡ Atajo: Cargar una receta guardada (x1, x2, x3...)
         </label>
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
           <div className="sm:col-span-2">
@@ -252,7 +252,7 @@ export default function PrecioJusto({ recetaPrecargada }) {
               type="number"
               step="any"
               min="0.1"
-              placeholder="Tandas (ej. 1)"
+              placeholder="Multiplicar (ej. 1)" title="Veces que prepararás la receta (ej: 1 normal, 2 el doble, 0.5 la mitad)"
               className="num"
               value={multiplicador}
               onChange={(e) => setMultiplicador(e.target.value)}
