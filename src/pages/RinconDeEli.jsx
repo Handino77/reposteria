@@ -51,21 +51,20 @@ export default function RinconDeEli({ isPro = false, isAdmin = false, user, onIr
   const [misEventos, setMisEventos] = useState([])   // [{post_id, tipo}]
   const [feedbackVisible, setFeedbackVisible] = useState(false)
 
-  /* ── Cargar posts publicados ── */
+  /* ── Cargar posts publicados (desde la vista protegida a nivel de BD) ── */
   useEffect(() => {
     async function cargar() {
       setLoading(true)
       const { data, error } = await supabase
-        .from('rincon_posts')
+        .from('rincon_posts_seguros')
         .select('*')
-        .eq('publicado', true)
         .order('orden', { ascending: true })
         .order('fecha_publicacion', { ascending: false })
       if (!error) setPosts(data || [])
       setLoading(false)
     }
     cargar()
-  }, [])
+  }, [user, isPro, isAdmin])
 
   /* ── Cargar eventos del usuario ── */
   useEffect(() => {
