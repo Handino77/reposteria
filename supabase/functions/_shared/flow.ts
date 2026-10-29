@@ -1,6 +1,6 @@
 // Flow.cl Helper for Supabase Edge Functions (Deno)
 
-const FLOW_BASE_URL = 'https://sandbox.flow.cl/api'
+const FLOW_BASE_URL = Deno.env.get('FLOW_API_URL') || 'https://sandbox.flow.cl/api'
 
 export async function signFlow(
   params: Record<string, string | number>,
