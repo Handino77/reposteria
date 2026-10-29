@@ -605,174 +605,241 @@ function TabMetricas({ metricas, posts }) {
 }
 
 
+
+
 /* ═══════════════════════════════════════════════════════════ */
 /* Tab de Embajadoras / Membresías PRO de Cortesía             */
 /* ═══════════════════════════════════════════════════════════ */
 function TabEmbajadoras({ ok, err }) {
-  const [reposteras, setReposteras] = useState([])
-  const [loading, setLoading] = useState(true)
   const [busqueda, setBusqueda] = useState('')
+  const [resultados, setResultados] = useState([])
+  const [buscando, setBuscando] = useState(false)
+  const [embajadorasActivas, setEmbajadorasActivas] = useState([])
+  const [cargandoActivas, setCargandoActivas] = useState(true)
   const [procesandoId, setProcesandoId] = useState(null)
 
-  async function cargarReposteras() {
-    setLoading(true)
-    const { data, error } = await supabase
-      .from('reposteras')
-      .select('id, nombre_contacto, nombre_negocio, estado_suscripcion, es_admin')
-      .order('nombre_contacto', { ascending: true })
-      .limit(50)
-
-    if (error) {
-      err('No se pudieron cargar las reposteras: ' + error.message)
-    } else {
-      setReposteras(data || [])
+  // Cargar únicamente las embajadoras que ya tienen cortesía activa
+  async function cargarEmbajadorasActivas() {
+    setCargandoActivas(true)
+    const { data, error } = await supabase.rpc('buscar_usuarias_embajadora', { termino: '' })
+    if (!error && data) {
+      setEmbajadorasActivas(data.filter((r) => r.estado_suscripcion === 'cortesia'))
     }
-    setLoading(false)
+    setCargandoActivas(false)
   }
 
   useEffect(() => {
-    cargarReposteras()
+    cargarEmbajadorasActivas()
   }, [])
 
-  async function cambiarEstado(rep, nuevoEstado) {
-    setProcesandoId(rep.id)
-    const { error } = await supabase
-      .from('reposteras')
-      .update({ estado_suscripcion: nuevoEstado })
-      .eq('id', rep.id)
+  // Buscar usuarias bajo demanda (mínimo 2 letras)
+  async function ejecutarBusqueda(e) {
+    e?.preventDefault()
+    const q = busqueda.trim()
+    if (q.length < 2) {
+      err('Escribe al menos 2 letras para buscar por correo o nombre.')
+      return
+    }
+
+    setBuscando(true)
+    const { data, error } = await supabase.rpc('buscar_usuarias_embajadora', { termino: q })
 
     if (error) {
-      err('Error al actualizar: ' + error.message)
+      err('Error al buscar: ' + error.message)
+    } else {
+      setResultados(data || [])
+    }
+    setBuscando(false)
+  }
+
+  // Otorgar o revocar cortesía PRO
+  async function cambiarEstado(rep, nuevoEstado) {
+    setProcesandoId(rep.id)
+
+    // Si la fila en reposteras no existía aún, insertarla o actualizarla
+    const { error } = await supabase
+      .from('reposteras')
+      .upsert({
+        id: rep.id,
+        nombre_contacto: rep.nombre_contacto || 'Repostera',
+        nombre_negocio: rep.nombre_negocio || 'Mi pastelería',
+        estado_suscripcion: nuevoEstado
+      }, { onConflict: 'id' })
+
+    if (error) {
+      err('Error al actualizar membresía: ' + error.message)
     } else {
       ok(
         nuevoEstado === 'cortesia'
-          ? `👑 ¡Listo! Se otorgó membresía Embajadora PRO a ${rep.nombre_contacto || rep.nombre_negocio}.`
-          : `Se removió la cortesía a ${rep.nombre_contacto || rep.nombre_negocio}.`
+          ? `👑 ¡Listo! Se otorgó membresía Embajadora PRO a ${rep.email}.`
+          : `Se removió la cortesía a ${rep.email}.`
       )
-      await cargarReposteras()
+      // Refrescar resultados locales y lista de activas
+      setResultados((prev) =>
+        prev.map((r) => (r.id === rep.id ? { ...r, estado_suscripcion: nuevoEstado } : r))
+      )
+      await cargarEmbajadorasActivas()
     }
     setProcesandoId(null)
   }
 
-  const filtradas = reposteras.filter((r) => {
-    const q = busqueda.toLowerCase()
-    return (
-      (r.nombre_contacto && r.nombre_contacto.toLowerCase().includes(q)) ||
-      (r.nombre_negocio && r.nombre_negocio.toLowerCase().includes(q)) ||
-      (r.estado_suscripcion && r.estado_suscripcion.toLowerCase().includes(q))
-    )
-  })
-
   return (
-    <div className="flex flex-col gap-5">
-      <div className="bg-[var(--superficie)] border border-[var(--linea)] rounded-[16px] p-5">
-        <div className="flex items-start gap-3">
-          <div className="w-10 h-10 rounded-full bg-[var(--oro-fondo)] text-[var(--oro)] flex items-center justify-center shrink-0">
+    <div className="flex flex-col gap-6">
+      {/* Caja de Búsqueda Principal */}
+      <div className="bg-[var(--superficie)] border border-[var(--linea)] rounded-[18px] p-6 shadow-xs">
+        <div className="flex items-start gap-3.5 mb-4">
+          <div className="w-11 h-11 rounded-full bg-[var(--oro-fondo)] text-[var(--oro)] flex items-center justify-center shrink-0">
             <Crown className="w-5 h-5 stroke-[2]" />
           </div>
           <div>
-            <h2 className="text-[15px] font-bold text-[var(--tinta)]">
-              Membresías Embajadoras Cifu (Cortesía)
+            <h2 className="text-[16px] font-bold text-[var(--tinta)]">
+              Buscar usuaria para activar Membresía Embajadora 👑
             </h2>
             <p className="text-[12.5px] text-[var(--tinta-suave)] mt-0.5 leading-relaxed">
-              Activa acceso PRO permanente y 100% gratuito para tus moderadoras de live, grupos de WhatsApp o colaboradoras fieles.
+              Ingresa el correo electrónico o nombre de tu colaboradora para buscarla en el sistema y otorgarle acceso PRO permanente.
             </p>
           </div>
         </div>
 
-        {/* Buscador de usuaria */}
-        <div className="mt-4 flex items-center gap-2.5 bg-[var(--superficie-2)] border border-[var(--linea)] rounded-[11px] px-3.5 py-2">
-          <Search className="w-4 h-4 text-[var(--tinta-tenue)] shrink-0" />
-          <input
-            type="search"
-            placeholder="Buscar por nombre o negocio..."
-            value={busqueda}
-            onChange={(e) => setBusqueda(e.target.value)}
-            className="flex-1 bg-transparent text-[13px] text-[var(--tinta)] placeholder:text-[var(--tinta-tenue)] outline-none"
-          />
-        </div>
-      </div>
-
-      {loading ? (
-        <p className="text-[13px] text-[var(--tinta-suave)] text-center py-8">Cargando reposteras registradas...</p>
-      ) : filtradas.length === 0 ? (
-        <div className="text-center py-10 text-[var(--tinta-suave)] bg-[var(--superficie)] rounded-[16px] border border-[var(--linea)]">
-          <p className="font-semibold text-[14px]">No se encontraron usuarias</p>
-          <p className="text-[12px] mt-1">Diles que primero creen su cuenta en la web para que aparezcan en esta lista.</p>
-        </div>
-      ) : (
-        <div className="bg-[var(--superficie)] border border-[var(--linea)] rounded-[16px] overflow-hidden">
-          <div className="px-5 py-3.5 border-b border-[var(--linea)] bg-[var(--superficie-2)] flex justify-between items-center text-[11px] font-bold uppercase tracking-wider text-[var(--tinta-tenue)]">
-            <span>Repostera / Negocio</span>
-            <span>Acceso PRO</span>
+        <form onSubmit={ejecutarBusqueda} className="flex flex-col sm:flex-row gap-2.5">
+          <div className="flex-1 flex items-center gap-2.5 bg-[var(--superficie-2)] border border-[var(--linea)] rounded-[12px] px-4 py-2.5 focus-within:border-[var(--vino)] transition-colors">
+            <Search className="w-4 h-4 text-[var(--tinta-tenue)] shrink-0" />
+            <input
+              type="search"
+              placeholder="Ej: nataly@gmail.com o Nataly Navia..."
+              value={busqueda}
+              onChange={(e) => setBusqueda(e.target.value)}
+              className="flex-1 bg-transparent text-[13.5px] text-[var(--tinta)] placeholder:text-[var(--tinta-tenue)] outline-none"
+            />
           </div>
-          <div className="divide-y divide-[var(--linea-suave)]">
-            {filtradas.map((r) => {
-              const esCortesia = r.estado_suscripcion === 'cortesia'
-              const esPagada = r.estado_suscripcion === 'activa'
-              const esAdmin = r.es_admin
+          <button
+            type="submit"
+            disabled={buscando || busqueda.trim().length < 2}
+            className="bg-[var(--vino)] text-white text-[13px] font-bold px-6 py-2.5 rounded-[12px] hover:brightness-110 disabled:opacity-50 transition-all cursor-pointer shrink-0"
+          >
+            {buscando ? 'Buscando...' : 'Buscar usuaria'}
+          </button>
+        </form>
 
-              return (
-                <div key={r.id} className="p-4 px-5 flex items-center justify-between gap-4">
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-semibold text-[13.5px] text-[var(--tinta)]">
-                        {r.nombre_contacto || 'Repostera'}
-                      </span>
-                      {esAdmin && (
-                        <span className="text-[9.5px] font-bold px-2 py-0.5 rounded-full bg-[var(--vino-suave)] text-[var(--vino)]">
-                          ADMIN
+        {/* Resultados de Búsqueda */}
+        {buscando ? (
+          <p className="text-[13px] text-[var(--tinta-suave)] text-center py-6">Consultando base de datos...</p>
+        ) : resultados.length > 0 ? (
+          <div className="mt-5 border border-[var(--linea-suave)] rounded-[14px] overflow-hidden">
+            <div className="bg-[var(--superficie-2)] px-4 py-2 text-[11px] font-bold uppercase tracking-wider text-[var(--tinta-tenue)]">
+              Resultados encontrados ({resultados.length})
+            </div>
+            <div className="divide-y divide-[var(--linea-suave)]">
+              {resultados.map((r) => {
+                const esCortesia = r.estado_suscripcion === 'cortesia'
+                const esPagada = r.estado_suscripcion === 'activa'
+                const esAdmin = r.es_admin
+
+                return (
+                  <div key={r.id} className="p-3.5 px-4 flex items-center justify-between gap-3 bg-[var(--superficie)]">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-bold text-[13.5px] text-[var(--tinta)]">
+                          {r.email}
                         </span>
-                      )}
-                      {esCortesia && (
-                        <span className="text-[9.5px] font-bold px-2 py-0.5 rounded-full bg-[var(--oro-fondo)] text-[var(--oro)] flex items-center gap-1">
-                          👑 Embajadora
-                        </span>
-                      )}
-                      {esPagada && (
-                        <span className="text-[9.5px] font-bold px-2 py-0.5 rounded-full bg-[var(--verde-fondo)] text-[var(--verde)]">
-                          PRO Pagada
-                        </span>
+                        {esAdmin && (
+                          <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-[var(--vino-suave)] text-[var(--vino)]">
+                            ADMIN
+                          </span>
+                        )}
+                        {esCortesia && (
+                          <span className="text-[9.5px] font-bold px-2 py-0.5 rounded-full bg-[var(--oro-fondo)] text-[var(--oro)]">
+                            👑 Embajadora Activa
+                          </span>
+                        )}
+                        {esPagada && (
+                          <span className="text-[9.5px] font-bold px-2 py-0.5 rounded-full bg-[var(--verde-fondo)] text-[var(--verde)]">
+                            PRO Pagada
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[11.5px] text-[var(--tinta-suave)] truncate mt-0.5">
+                        {r.nombre_contacto && r.nombre_contacto !== 'Repostera' ? r.nombre_contacto : ''} 
+                        {r.nombre_negocio && r.nombre_negocio !== 'Mi pastelería' ? ` · ${r.nombre_negocio}` : ''}
+                      </p>
+                    </div>
+
+                    <div className="shrink-0">
+                      {esAdmin ? (
+                        <span className="text-[11px] text-[var(--tinta-tenue)] font-medium">Cuenta Dueña</span>
+                      ) : esPagada ? (
+                        <span className="text-[11px] text-[var(--verde)] font-semibold">Suscripción Pagada</span>
+                      ) : esCortesia ? (
+                        <button
+                          type="button"
+                          disabled={procesandoId === r.id}
+                          onClick={() => cambiarEstado(r, 'pendiente')}
+                          className="text-[11.5px] font-bold text-red-700 bg-red-50 hover:bg-red-100 px-3.5 py-1.5 rounded-full transition-all cursor-pointer disabled:opacity-50"
+                        >
+                          {procesandoId === r.id ? 'Guardando...' : 'Quitar cortesía'}
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          disabled={procesandoId === r.id}
+                          onClick={() => cambiarEstado(r, 'cortesia')}
+                          className="text-[12px] font-bold text-[var(--oro)] bg-[var(--oro-fondo)] hover:brightness-95 px-4 py-1.5 rounded-full transition-all cursor-pointer shadow-xs disabled:opacity-50 flex items-center gap-1.5"
+                        >
+                          <Crown className="w-3.5 h-3.5 stroke-[2]" />
+                          <span>{procesandoId === r.id ? 'Guardando...' : 'Hacer Embajadora PRO'}</span>
+                        </button>
                       )}
                     </div>
-                    <p className="text-[11.5px] text-[var(--tinta-suave)] truncate mt-0.5">
-                      {r.nombre_negocio || 'Sin nombre de pastelería'}
-                    </p>
                   </div>
-
-                  {/* Botón de acción */}
-                  <div className="shrink-0">
-                    {esAdmin ? (
-                      <span className="text-[11px] text-[var(--tinta-tenue)] font-medium">Cuenta Dueña</span>
-                    ) : esPagada ? (
-                      <span className="text-[11px] text-[var(--verde)] font-semibold">Suscripción Flow Activa</span>
-                    ) : esCortesia ? (
-                      <button
-                        type="button"
-                        disabled={procesandoId === r.id}
-                        onClick={() => cambiarEstado(r, 'pendiente')}
-                        className="text-[11.5px] font-bold text-red-700 bg-red-50 hover:bg-red-100 px-3.5 py-1.5 rounded-full transition-all cursor-pointer disabled:opacity-50"
-                      >
-                        {procesandoId === r.id ? 'Actualizando...' : 'Quitar cortesía'}
-                      </button>
-                    ) : (
-                      <button
-                        type="button"
-                        disabled={procesandoId === r.id}
-                        onClick={() => cambiarEstado(r, 'cortesia')}
-                        className="text-[11.5px] font-bold text-[var(--oro)] bg-[var(--oro-fondo)] hover:brightness-95 px-3.5 py-1.5 rounded-full transition-all cursor-pointer shadow-xs disabled:opacity-50 flex items-center gap-1"
-                      >
-                        <Crown className="w-3.5 h-3.5 stroke-[2]" />
-                        <span>{procesandoId === r.id ? 'Guardando...' : 'Hacer Embajadora PRO'}</span>
-                      </button>
-                    )}
-                  </div>
-                </div>
-              )
-            })}
+                )
+              })}
+            </div>
           </div>
-        </div>
-      )}
+        ) : busqueda.trim().length >= 2 ? (
+          <p className="text-[12.5px] text-[var(--tinta-suave)] text-center py-5 italic">
+            No encontramos ninguna usuaria registrada con "{busqueda}". Pídele que primero cree su cuenta en la web.
+          </p>
+        ) : null}
+      </div>
+
+      {/* Listado permanente de Embajadoras que YA tienen cortesía activa */}
+      <div className="bg-[var(--superficie)] border border-[var(--linea)] rounded-[18px] p-6 shadow-xs">
+        <h3 className="text-[14px] font-bold text-[var(--tinta)] mb-3 flex items-center gap-2">
+          <span>👑 Embajadoras con membresía activa</span>
+          <span className="text-xs bg-[var(--oro-fondo)] text-[var(--oro)] font-bold px-2 py-0.5 rounded-full">
+            {embajadorasActivas.length}
+          </span>
+        </h3>
+
+        {cargandoActivas ? (
+          <p className="text-[12.5px] text-[var(--tinta-suave)] py-3">Cargando...</p>
+        ) : embajadorasActivas.length === 0 ? (
+          <p className="text-[12.5px] text-[var(--tinta-suave)] py-2 italic">
+            Aún no has asignado membresías de cortesía. Usa el buscador de arriba para agregar a tus moderadoras.
+          </p>
+        ) : (
+          <div className="divide-y divide-[var(--linea-suave)] border border-[var(--linea-suave)] rounded-[12px] overflow-hidden">
+            {embajadorasActivas.map((r) => (
+              <div key={r.id} className="p-3 px-4 flex items-center justify-between gap-3 bg-[var(--superficie)]">
+                <div>
+                  <p className="font-bold text-[13px] text-[var(--tinta)]">{r.email}</p>
+                  <p className="text-[11.5px] text-[var(--tinta-suave)]">
+                    {r.nombre_contacto || r.nombre_negocio || 'Embajadora Cifu'}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  disabled={procesandoId === r.id}
+                  onClick={() => cambiarEstado(r, 'pendiente')}
+                  className="text-[11px] font-bold text-red-700 hover:text-red-900 hover:underline cursor-pointer disabled:opacity-50"
+                >
+                  {procesandoId === r.id ? 'Guardando...' : 'Quitar cortesía'}
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   )
 }
