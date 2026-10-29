@@ -22,9 +22,9 @@ serve(async (req) => {
     token = url.searchParams.get('token') || ''
   }
 
-  // Obtener URL de retorno base desde el query param 'returnTo' o default a localhost:5174
+  // Obtener URL de retorno base desde el query param 'returnTo' o default a producción
   const urlObj = new URL(req.url)
-  const returnTo = urlObj.searchParams.get('returnTo') || 'http://localhost:5174'
+  const returnTo = urlObj.searchParams.get('returnTo') || 'https://www.kitrepostera.cl'
   
   // Construir la URL final hacia la SPA React con los parámetros de la pestaña y token
   const redirectTarget = new URL(returnTo)
