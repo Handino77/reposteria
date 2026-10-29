@@ -1,11 +1,14 @@
 import React, { useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
-import { LogIn, UserPlus, Cake, AlertCircle } from 'lucide-react'
+import { LogIn, UserPlus, AlertCircle, KeyRound, ArrowLeft } from 'lucide-react'
 import { Campo, Input } from '../components/ui/Campo'
 import { Boton } from '../components/ui/Boton'
+import logoWebP from '../assets/images/logo-cifu.webp'
+import logoPNG from '../assets/images/logo-cifu.png'
 
 export default function Login() {
   const [isRegistering, setIsRegistering] = useState(false)
+  const [isRecovering, setIsRecovering] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [nombreNegocio, setNombreNegocio] = useState('')
@@ -26,6 +29,28 @@ export default function Login() {
       if (error) throw error
     } catch (err) {
       setErrorMsg(err.message || 'Error al conectar con Google')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handlePasswordRecovery = async (e) => {
+    e.preventDefault()
+    setLoading(true)
+    setErrorMsg('')
+    setInfoMsg('')
+
+    try {
+      if (!email.trim()) {
+        throw new Error('Por favor escribe tu correo electrónico')
+      }
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/?tab=suscripcion`
+      })
+      if (error) throw error
+      setInfoMsg('¡Listo! Te hemos enviado un enlace a tu correo para restablecer tu contraseña. Revisa tu bandeja de entrada o spam.')
+    } catch (err) {
+      setErrorMsg(err.message || 'No pudimos enviar el correo de recuperación.')
     } finally {
       setLoading(false)
     }
@@ -76,16 +101,28 @@ export default function Login() {
       {/* Container Principal */}
       <div className="w-full max-w-md bg-[var(--superficie)] rounded-[20px] shadow-[var(--sombra-panel)] p-8 border border-[var(--linea)]">
         
-        {/* Header */}
+        {/* Header con Logo de Cifu Pasticceria */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-[14px] bg-[var(--vino)] text-white shadow-[var(--sombra-boton)] mb-3">
-            <Cake className="w-7 h-7 stroke-[1.8]" />
-          </div>
+          <picture className="inline-block mb-3 shrink-0">
+            <source srcSet={logoWebP} type="image/webp" />
+            <img
+              src={logoPNG}
+              alt="Logo Cifu Pasticceria"
+              width={64}
+              height={64}
+              className="w-16 h-16 rounded-full object-cover mx-auto"
+              style={{ boxShadow: '0 4px 14px rgba(142,58,88,0.22), 0 0 0 2px rgba(142,58,88,0.3)' }}
+            />
+          </picture>
           <h1 className="font-serif-title text-3xl font-semibold text-[var(--tinta)]">
             Kit de la Repostera
           </h1>
           <p className="text-xs text-[var(--tinta-suave)] mt-1.5 font-medium">
-            {isRegistering ? 'Crea tu cuenta para comenzar' : 'Bienvenida de nuevo'}
+            {isRecovering
+              ? 'Recupera tu acceso'
+              : isRegistering
+              ? 'Crea tu cuenta para comenzar'
+              : 'Bienvenida de nuevo'}
           </p>
         </div>
 
@@ -103,133 +140,194 @@ export default function Login() {
           </div>
         )}
 
-        {/* Botón Google OAuth */}
-        <button
-          type="button"
-          onClick={handleGoogleLogin}
-          disabled={loading}
-          className="w-full h-[44px] flex items-center justify-center gap-3 bg-white hover:bg-[var(--superficie-2)] border border-[var(--linea)] text-[var(--tinta-media)] font-bold text-[12.5px] rounded-[11px] transition-all mb-6 disabled:opacity-50 cursor-pointer"
-        >
-          <svg className="w-4 h-4" viewBox="0 0 24 24">
-            <path
-              fill="#4285F4"
-              d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-            />
-            <path
-              fill="#34A853"
-              d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-            />
-            <path
-              fill="#FBBC05"
-              d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
-            />
-            <path
-              fill="#EA4335"
-              d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
-            />
-          </svg>
-          <span>Continuar con Google</span>
-        </button>
-
-        <div className="relative my-6 text-center">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-[var(--linea-suave)]"></div>
-          </div>
-          <span className="relative bg-[var(--superficie)] px-3 text-[10.5px] font-bold text-[var(--tinta-tenue)] uppercase tracking-[0.1em]">
-            o con tu correo
-          </span>
-        </div>
-
-        {/* Formulario Email */}
-        <form onSubmit={handleEmailAuth} className="space-y-4">
-          {isRegistering && (
-            <Campo id="login-negocio" label="Nombre de tu Negocio">
+        {/* MODO RECUPERACIÓN DE CONTRASEÑA */}
+        {isRecovering ? (
+          <form onSubmit={handlePasswordRecovery} className="space-y-4">
+            <p className="text-xs text-[var(--tinta-media)] mb-2">
+              Ingresa el correo con el que te registraste y te enviaremos las instrucciones para restablecer tu contraseña:
+            </p>
+            <Campo label="Correo Electrónico">
               <Input
-                id="login-negocio"
-                type="text"
-                placeholder="Ej: Dulce Antojo"
-                value={nombreNegocio}
-                onChange={(e) => setNombreNegocio(e.target.value)}
+                id="recovery-email"
+                type="email"
+                required
+                placeholder="tu@email.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
             </Campo>
-          )}
 
-          <Campo id="login-email" label="Correo Electrónico">
-            <Input
-              id="login-email"
-              type="email"
-              required
-              placeholder="tu@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </Campo>
+            <Boton
+              variante="principal"
+              type="submit"
+              disabled={loading}
+              className="w-full h-[44px] mt-2 cursor-pointer"
+            >
+              <KeyRound className="w-4 h-4 stroke-[2]" />
+              <span>{loading ? 'Enviando...' : 'Enviar enlace de recuperación'}</span>
+            </Boton>
 
-          <Campo id="login-pass" label="Contraseña">
-            <Input
-              id="login-pass"
-              type="password"
-              required
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </Campo>
+            <button
+              type="button"
+              onClick={() => {
+                setIsRecovering(false)
+                setErrorMsg('')
+                setInfoMsg('')
+              }}
+              className="w-full flex items-center justify-center gap-1.5 text-xs text-[var(--tinta-suave)] hover:text-[var(--tinta)] pt-2 cursor-pointer transition-colors"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Volver a Iniciar Sesión</span>
+            </button>
+          </form>
+        ) : (
+          <>
+            {/* Botón Google OAuth */}
+            <button
+              type="button"
+              onClick={handleGoogleLogin}
+              disabled={loading}
+              className="w-full h-[44px] flex items-center justify-center gap-3 bg-white hover:bg-[var(--superficie-2)] border border-[var(--linea)] text-[var(--tinta-media)] font-bold text-[12.5px] rounded-[11px] transition-all mb-6 disabled:opacity-50 cursor-pointer shadow-xs"
+            >
+              <svg className="w-4 h-4" viewBox="0 0 24 24">
+                <path
+                  fill="#4285F4"
+                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                />
+                <path
+                  fill="#34A853"
+                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                />
+                <path
+                  fill="#FBBC05"
+                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
+                />
+                <path
+                  fill="#EA4335"
+                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+                />
+              </svg>
+              <span>Continuar con Google</span>
+            </button>
 
-          <Boton
-            variante="principal"
-            type="submit"
-            disabled={loading}
-            className="w-full h-[44px] mt-2"
-          >
-            {isRegistering ? (
-              <>
-                <UserPlus className="w-4 h-4 stroke-[2]" />
-                <span>{loading ? 'Creando cuenta...' : 'Crear Cuenta'}</span>
-              </>
-            ) : (
-              <>
-                <LogIn className="w-4 h-4 stroke-[2]" />
-                <span>{loading ? 'Ingresando...' : 'Iniciar Sesión'}</span>
-              </>
-            )}
-          </Boton>
-        </form>
+            {/* Divisor */}
+            <div className="relative mb-6">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-[var(--linea)]" />
+              </div>
+              <div className="relative flex justify-center text-[10px] uppercase tracking-wider text-[var(--tinta-tenue)] font-bold">
+                <span className="bg-[var(--superficie)] px-3">O con tu correo</span>
+              </div>
+            </div>
 
-        {/* Toggle Login/Register */}
-        <div className="mt-6 text-center text-xs text-[var(--tinta-suave)]">
-          {isRegistering ? (
-            <p>
-              ¿Ya tienes una cuenta?{' '}
-              <button
-                type="button"
-                onClick={() => {
-                  setIsRegistering(false)
-                  setErrorMsg('')
-                  setInfoMsg('')
-                }}
-                className="text-[var(--vino)] font-bold hover:underline cursor-pointer"
+            {/* Formulario Email/Pass */}
+            <form onSubmit={handleEmailAuth} className="space-y-4">
+              {isRegistering && (
+                <Campo label="Nombre de tu Pastelería / Negocio">
+                  <Input
+                    id="register-business-name"
+                    type="text"
+                    placeholder="Ej. Dulces Momentos"
+                    value={nombreNegocio}
+                    onChange={(e) => setNombreNegocio(e.target.value)}
+                  />
+                </Campo>
+              )}
+
+              <Campo label="Correo Electrónico">
+                <Input
+                  id="login-email"
+                  type="email"
+                  required
+                  placeholder="tu@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </Campo>
+
+              <Campo label="Contraseña">
+                <Input
+                  id="login-pass"
+                  type="password"
+                  required
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </Campo>
+
+              {!isRegistering && (
+                <div className="flex justify-end -mt-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsRecovering(true)
+                      setErrorMsg('')
+                      setInfoMsg('')
+                    }}
+                    className="text-[11px] text-[var(--tinta-suave)] hover:text-[var(--vino)] hover:underline cursor-pointer"
+                  >
+                    ¿Olvidaste tu contraseña?
+                  </button>
+                </div>
+              )}
+
+              <Boton
+                variante="principal"
+                type="submit"
+                disabled={loading}
+                className="w-full h-[44px] mt-2 cursor-pointer"
               >
-                Inicia Sesión
-              </button>
-            </p>
-          ) : (
-            <p>
-              ¿No tienes una cuenta aún?{' '}
-              <button
-                type="button"
-                onClick={() => {
-                  setIsRegistering(true)
-                  setErrorMsg('')
-                  setInfoMsg('')
-                }}
-                className="text-[var(--vino)] font-bold hover:underline cursor-pointer"
-              >
-                Regístrate gratis
-              </button>
-            </p>
-          )}
-        </div>
+                {isRegistering ? (
+                  <>
+                    <UserPlus className="w-4 h-4 stroke-[2]" />
+                    <span>{loading ? 'Creando cuenta...' : 'Crear Cuenta'}</span>
+                  </>
+                ) : (
+                  <>
+                    <LogIn className="w-4 h-4 stroke-[2]" />
+                    <span>{loading ? 'Ingresando...' : 'Iniciar Sesión'}</span>
+                  </>
+                )}
+              </Boton>
+            </form>
+
+            {/* Toggle Login/Register */}
+            <div className="mt-6 text-center text-xs text-[var(--tinta-suave)]">
+              {isRegistering ? (
+                <p>
+                  ¿Ya tienes una cuenta?{' '}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsRegistering(false)
+                      setErrorMsg('')
+                      setInfoMsg('')
+                    }}
+                    className="text-[var(--vino)] font-bold hover:underline cursor-pointer"
+                  >
+                    Inicia Sesión
+                  </button>
+                </p>
+              ) : (
+                <p>
+                  ¿No tienes una cuenta aún?{' '}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsRegistering(true)
+                      setErrorMsg('')
+                      setInfoMsg('')
+                    }}
+                    className="text-[var(--vino)] font-bold hover:underline cursor-pointer"
+                  >
+                    Regístrate gratis
+                  </button>
+                </p>
+              )}
+            </div>
+          </>
+        )}
 
         {/* Enlaces Legales y Privacidad (Ley N° 19.628 / 21.719 Chile) */}
         <div className="mt-8 pt-4 border-t border-[var(--linea-suave)] text-center text-[11px] text-[var(--tinta-suave)] space-y-1.5">
