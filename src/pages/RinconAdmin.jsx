@@ -618,8 +618,8 @@ function TabEmbajadoras({ ok, err }) {
     setLoading(true)
     const { data, error } = await supabase
       .from('reposteras')
-      .select('id, nombre_contacto, nombre_negocio, estado_suscripcion, es_admin, creado_en')
-      .order('creado_en', { ascending: false })
+      .select('id, nombre_contacto, nombre_negocio, estado_suscripcion, es_admin')
+      .order('nombre_contacto', { ascending: true })
       .limit(50)
 
     if (error) {
