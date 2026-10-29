@@ -69,6 +69,7 @@ export default function Login() {
           email,
           password,
           options: {
+            emailRedirectTo: `${window.location.origin}/`,
             data: {
               nombre_negocio: nombreNegocio || 'Mi negocio'
             }
@@ -78,8 +79,12 @@ export default function Login() {
 
         if (data?.user?.identities?.length === 0) {
           setErrorMsg('Este correo ya se encuentra registrado. Intenta iniciar sesión.')
+        } else if (data?.session) {
+          // Si entró directo sin confirmación
+          setInfoMsg('¡Registro exitoso! Iniciando sesión...')
         } else {
-          setInfoMsg('¡Registro exitoso! Revisa tu correo o inicia sesión si la confirmación no está requerida.')
+          // Requiere confirmación de correo
+          setInfoMsg('¡Cuenta creada con éxito! 🧁 Te enviamos un correo de confirmación. Revisa tu bandeja de entrada o spam para activar tu cuenta.')
         }
       } else {
         // Inicio de sesión
