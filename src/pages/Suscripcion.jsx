@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+﻿import React, { useState, useEffect, useRef } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { CLP } from '../utils/conversores'
 import { Crown, CreditCard, CheckCircle2, AlertTriangle, ShieldCheck, Loader2, RefreshCw, Clock } from 'lucide-react'
@@ -251,6 +251,11 @@ export default function Suscripcion({ user }) {
 
                 {/* Badge Estado */}
                 <div>
+                  {estado === 'cortesia' && (
+                    <Pastilla tono="destacado" icono={Crown}>
+                      Membresía Embajadora 👑
+                    </Pastilla>
+                  )}
                   {estado === 'activa' && (
                     <Pastilla tono="exito" icono={CheckCircle2}>
                       Suscripción Activa

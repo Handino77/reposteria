@@ -56,7 +56,7 @@ export default function Dashboard({ user }) {
     }
   }, [user])
 
-  const isPro = estadoSuscripcion === 'activa'
+  const isPro = estadoSuscripcion === 'activa' || estadoSuscripcion === 'cortesia'
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
