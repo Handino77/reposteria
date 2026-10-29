@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { RefreshCw, Scale, PieChart, Egg, Bandage, Flame, Table, ChevronDown, ChevronUp } from 'lucide-react'
+import { RefreshCw, Scale, PieChart, Egg, Bandage, Flame, Table, ChevronDown, ChevronUp, BookOpen } from 'lucide-react'
 import {
   densidadTazas
 } from '../utils/conversores'
@@ -184,32 +184,32 @@ export default function Conversor() {
   )
 
   const subtabsList = [
-    { id: 'tazas', icon: Scale, label: '🥣 Tazas & Cucharas' },
-    { id: 'peso-vol', icon: RefreshCw, label: '⚖️ Peso & Volumen' },
-    { id: 'moldes', icon: PieChart, label: '🎂 Adaptador de Moldes' },
-    { id: 'huevos', icon: Egg, label: '🥚 Huevos & Medidas' },
-    { id: 'sustitutos', icon: Bandage, label: '🩹 Sustitutos Express' },
-    { id: 'temperatura', icon: Flame, label: '🌡️ Horno (°C / °F)' },
-    { id: 'tablas', icon: Table, label: '📋 Tablas Maestras' }
+    { id: 'tazas', icon: Scale, label: 'Tazas & Cucharas' },
+    { id: 'peso-vol', icon: RefreshCw, label: 'Peso & Volumen' },
+    { id: 'moldes', icon: PieChart, label: 'Adaptador de Moldes' },
+    { id: 'huevos', icon: Egg, label: 'Huevos & Medidas' },
+    { id: 'sustitutos', icon: Bandage, label: 'Sustitutos Express' },
+    { id: 'temperatura', icon: Flame, label: 'Horno (°C / °F)' },
+    { id: 'tablas', icon: Table, label: 'Tablas Maestras' }
   ]
 
   return (
     <div className="space-y-6">
       {/* Encabezado */}
       <EncabezadoPagina
-        antetitulo="Hecho con cariño por Eli 💖"
+        antetitulo="Hecho con cariño por Eli"
         titulo="De tazas a gramos (Conversor)"
         introduccion="Guía y calculadora completa de equivalencias reposteras: tazas, cucharas, peso, volumen, moldes, huevos, sustitutos y horno."
       />
 
       {/* Mini-Guía desplegable */}
-      <div className="bg-[var(--superficie)] border border-[var(--linea)] border-l-4 border-l-[var(--oro)] rounded-[14px] p-4 shadow-sm">
+      <div className="bg-[var(--superficie)] border border-[var(--linea)] rounded-[14px] p-4 shadow-sm">
         <button
           type="button"
           onClick={() => setGuiaOpen(!guiaOpen)}
           className="w-full flex items-center justify-between text-left font-bold text-xs md:text-sm text-[var(--tinta)] cursor-pointer"
         >
-          <span>💡 Guía de herramientas reposteras de conversión</span>
+          <span className="flex items-center gap-2"><BookOpen className="w-4 h-4 shrink-0 text-[var(--vino)]" strokeWidth={1.75} /><span>Guía de herramientas reposteras de conversión</span></span>
           <span className="flex items-center gap-1 text-[11px] text-[var(--oro)] bg-[var(--oro-fondo)] px-2.5 py-1 rounded-full font-semibold shrink-0 ml-2">
             {guiaOpen ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
             {guiaOpen ? 'Ocultar guía' : 'Ver mini-guía'}
@@ -218,12 +218,12 @@ export default function Conversor() {
 
         {guiaOpen && (
           <div className="mt-3 pt-3 border-t border-dashed border-[var(--linea-suave)] text-xs text-[var(--tinta-suave)] space-y-1.5 leading-relaxed">
-            <p>• <b>🥣 Tazas & Cucharas:</b> Conversión exacta a gramos según la densidad real del ingrediente.</p>
-            <p>• <b>⚖️ Peso & Volumen:</b> Conversión métrica directa entre Kilos, Gramos, Libras, Onzas, Litros y Mililitros.</p>
-            <p>• <b>🎂 Adaptador de Moldes:</b> Calcula por cuánto multiplicar tu masa al cambiar de molde manteniendo la misma altura.</p>
-            <p>• <b>🥚 Huevos & Medidas:</b> Pesos netos de claras y yemas por calibre.</p>
-            <p>• <b>🩹 Sustitutos Express:</b> Alternativas de emergencia cuando te falta un insumo.</p>
-            <p>• <b>🌡️ Horno & Tablas:</b> Grados °C / °F y tablas de consulta rápida.</p>
+            <p>• <b>Tazas & Cucharas:</b> Conversión exacta a gramos según la densidad real del ingrediente.</p>
+            <p>• <b>Peso & Volumen:</b> Conversión métrica directa entre Kilos, Gramos, Libras, Onzas, Litros y Mililitros.</p>
+            <p>• <b>Adaptador de Moldes:</b> Calcula por cuánto multiplicar tu masa al cambiar de molde manteniendo la misma altura.</p>
+            <p>• <b>Huevos & Medidas:</b> Pesos netos de claras y yemas por calibre.</p>
+            <p>• <b>Sustitutos Express:</b> Alternativas de emergencia cuando te falta un insumo.</p>
+            <p>• <b>Horno & Tablas:</b> Grados °C / °F y tablas de consulta rápida.</p>
           </div>
         )}
       </div>
@@ -240,7 +240,10 @@ export default function Conversor() {
                 : 'text-[var(--tinta-suave)] hover:text-[var(--tinta)]'
             }`}
           >
-            {st.label}
+            <span className="flex items-center justify-center gap-1.5">
+              <st.icon className="w-3.5 h-3.5 shrink-0" strokeWidth={1.75} />
+              {st.label}
+            </span>
           </button>
         ))}
       </div>
@@ -250,7 +253,7 @@ export default function Conversor() {
       {/* ========================================================= */}
       {activeSubtab === 'tazas' && (
         <div className="space-y-6">
-          <Panel titulo="🥣 Tazas a gramos (240 ml estándar americana)">
+          <Panel titulo="Tazas a gramos (240 ml estándar americana)">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
               <Campo label="Ingrediente">
                 <Select
@@ -317,7 +320,7 @@ export default function Conversor() {
             </div>
           </Panel>
 
-          <Panel titulo="🥄 Cucharadas y Cucharaditas a gramos">
+          <Panel titulo="Cucharadas y Cucharaditas a gramos">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
               <Campo label="Tipo de medida">
                 <Select
@@ -374,7 +377,7 @@ export default function Conversor() {
       {/* B2. Peso & Volumen */}
       {/* ========================================================= */}
       {activeSubtab === 'peso-vol' && (
-        <Panel titulo="⚖️ Conversor de Peso & Volumen Métrico">
+        <Panel titulo="Conversor de Peso & Volumen Métrico">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
             <Campo label="Cantidad a convertir">
               <Input
@@ -468,7 +471,7 @@ export default function Conversor() {
       {/* ========================================================= */}
       {activeSubtab === 'moldes' && (
         <div className="space-y-6">
-          <Panel titulo="📐 Equivalencia Pulgadas ↔ Centímetros (Moldes)">
+          <Panel titulo="Equivalencia Pulgadas ↔ Centímetros (Moldes)">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Campo label="Diámetro / Ancho en Pulgadas (in / &quot;)">
                 <Input
@@ -490,7 +493,7 @@ export default function Conversor() {
             </div>
           </Panel>
 
-          <Panel titulo="🎂 Calculadora de Factor de Escala para Moldes">
+          <Panel titulo="Calculadora de Factor de Escala para Moldes">
             <p className="text-xs text-[var(--tinta-suave)] mb-4">
               Compara el área del molde original de tu receta con el nuevo molde que vas a usar para multiplicar todos tus ingredientes.
             </p>
@@ -610,7 +613,7 @@ export default function Conversor() {
       {/* B4. Huevos & Medidas */}
       {/* ========================================================= */}
       {activeSubtab === 'huevos' && (
-        <Panel titulo="🥚 Calculadora de Peso de Huevos (Sin cáscara)">
+        <Panel titulo="Calculadora de Peso de Huevos (Sin cáscara)">
           <p className="text-xs text-[var(--tinta-suave)] mb-4">
             Calcula el peso neto aproximado de claras y yemas (se descuenta el 12% correspondiente a la cáscara).
           </p>
@@ -674,7 +677,7 @@ export default function Conversor() {
       {/* B5. Sustitutos Express */}
       {/* ========================================================= */}
       {activeSubtab === 'sustitutos' && (
-        <Panel titulo="🩹 Guía de Sustitutos Reposteros Express">
+        <Panel titulo="Guía de Sustitutos Reposteros Express">
           <div className="mb-4">
             <Campo label="¿Qué ingrediente te falta hoy?">
               <Select
@@ -708,7 +711,7 @@ export default function Conversor() {
       {/* B6. Horno °C / °F */}
       {/* ========================================================= */}
       {activeSubtab === 'temperatura' && (
-        <Panel titulo="🌡️ Temperatura del Horno (°C ↔ °F)">
+        <Panel titulo="Temperatura del Horno (°C ↔ °F)">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
             <Campo label="Grados Celsius (°C)">
               <Input
@@ -744,11 +747,11 @@ export default function Conversor() {
       {/* B7. Tablas Maestras */}
       {/* ========================================================= */}
       {activeSubtab === 'tablas' && (
-        <Panel titulo="📋 Tabla Maestra de Pesos por Taza (1 taza = 240 ml)">
+        <Panel titulo="Tabla Maestra de Pesos por Taza (1 taza = 240 ml)">
           <div className="mb-4">
             <Input
               type="text"
-              placeholder="🔎 Buscar ingrediente en la tabla..."
+              placeholder="Buscar ingrediente en la tabla..."
               value={filtroTablaTazas}
               onChange={(e) => setFiltroTablaTazas(e.target.value)}
             />
